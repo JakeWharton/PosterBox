@@ -6,8 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlin.time.Duration.Companion.seconds
-import kotlinx.browser.document
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Footer
@@ -17,8 +15,6 @@ import org.jetbrains.compose.web.dom.Main
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
-private val CssAnimationDuration = 1.seconds
-
 @Composable
 fun PosterBox(config: Config, posters: List<Poster>) {
 	// Start with the same poster loaded in both positions. The browser should de-duplicate this
@@ -27,28 +23,24 @@ fun PosterBox(config: Config, posters: List<Poster>) {
 	var posterTwo by remember { mutableStateOf(posters[0]) }
 	var posterOneActive by remember { mutableStateOf(true) }
 
-	LaunchedEffect(posters) {
-		// Wait for the CSS animation time. CSS animations are actually disabled for the initial load,
-		// but we use this as an approximation for how long it takes the browser to render the initial
-		// DOM and hopefully load the first poster. After this we can re-enable animations.
-		delay(CssAnimationDuration)
-		document.body!!.classList.remove("disable-animation")
+	if (posters.size > 1) {
+		LaunchedEffect(config, posters) {
+			var nextPosterIndex = 1
+			while (true) {
+				val nextPoster = posters[nextPosterIndex]
+				if (posterOneActive) {
+					posterTwo = nextPoster
+				} else {
+					posterOne = nextPoster
+				}
+				delay(config.posterDisplayDuration) // Poster display time.
 
-		var nextPosterIndex = 1
-		while (true) {
-			val nextPoster = posters[nextPosterIndex]
-			if (posterOneActive) {
-				posterTwo = nextPoster
-			} else {
-				posterOne = nextPoster
-			}
-			delay(config.posterDisplayDuration) // Poster display time.
+				posterOneActive = !posterOneActive
+				delay(CssAnimationDuration) // CSS animation time.
 
-			posterOneActive = !posterOneActive
-			delay(CssAnimationDuration) // CSS animation time.
-
-			if (++nextPosterIndex == posters.size) {
-				nextPosterIndex = 0
+				if (++nextPosterIndex == posters.size) {
+					nextPosterIndex = 0
+				}
 			}
 		}
 	}
