@@ -2,6 +2,37 @@
 
 Rotating display of Movie and TV posters.
 
+## Configuration
+
+The configuration file allows customization of behavior and specifies the source of content.
+All top-level keys and sections are optional.
+An empty configuration file is technically valid, but will result in no content being displayed.
+
+```toml
+# Item display duration in seconds (optional).
+#  Value: must be positive integer
+#  Default: 15
+itemDisplayDuration = "15"
+
+# Transition between items (optional).
+#  Value: "none", "fade", "crossfade", "slide-right", or "slide-left"
+#  Default: "fade"
+itemTransition = "slide-right"
+
+# Use Plex as a content source.
+#  This section is optional but has required keys if it is present.
+[plex]
+# Plex host URL (required).
+#  Value: DNS hostname or IP with protocol and optional port.
+host = "http://plexms:32800"
+# Plex authentication token (required).
+token = "abc123"
+# Libraries from which to pull posters (optional).
+#  Value: Array of case-sensitive library names or null to use all available libraries.
+#  Default: null
+libraries = [ "Movies", "TV Shows" ]
+```
+
 
 ## License
 

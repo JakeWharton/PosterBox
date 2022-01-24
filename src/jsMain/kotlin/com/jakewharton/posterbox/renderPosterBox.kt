@@ -33,10 +33,10 @@ fun PosterBox(config: Config, posters: List<Poster>) {
 				} else {
 					posterOne = nextPoster
 				}
-				delay(config.posterDisplayDuration) // Poster display time.
+				delay(config.itemDisplayDuration)
 
 				posterOneActive = !posterOneActive
-				delay(CssAnimationDuration) // CSS animation time.
+				delay(CssAnimationDuration)
 
 				if (++nextPosterIndex == posters.size) {
 					nextPosterIndex = 0
@@ -48,7 +48,7 @@ fun PosterBox(config: Config, posters: List<Poster>) {
 	Header {
 		PosterHeader("Now Showing")
 	}
-	Main({ classes(transitionClass(Transition.SlideLeft)) }) {
+	Main({ classes(transitionClass(config.itemTransition)) }) {
 		PosterImage(posterOne.posterUrl, posterOneActive)
 		PosterImage(posterTwo.posterUrl, !posterOneActive)
 	}
@@ -97,12 +97,12 @@ private fun ratingClass(rating: String): String {
 	}
 }
 
-private fun transitionClass(transition: Transition): String {
-	return when (transition) {
-		Transition.None -> "transition-none"
-		Transition.Crossfade -> "transition-crossfade"
-		Transition.Fade -> "transition-fade"
-		Transition.SlideLeft -> "transition-slide-left"
-		Transition.SlideRight -> "transition-slide-right"
+private fun transitionClass(itemTransition: ItemTransition): String {
+	return when (itemTransition) {
+		ItemTransition.None -> "transition-none"
+		ItemTransition.Crossfade -> "transition-crossfade"
+		ItemTransition.Fade -> "transition-fade"
+		ItemTransition.SlideLeft -> "transition-slide-left"
+		ItemTransition.SlideRight -> "transition-slide-right"
 	}
 }

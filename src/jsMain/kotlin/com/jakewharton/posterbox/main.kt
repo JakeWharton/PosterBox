@@ -57,10 +57,7 @@ suspend fun main() {
 
 private suspend fun loadConfig(): Config {
 	delay(1_000)
-	return Config(
-		posterDisplayDuration = 15.seconds,
-		posterTransition = Transition.SlideLeft,
-	)
+	return Config()
 }
 
 private suspend fun loadPosters(): List<Poster> {
