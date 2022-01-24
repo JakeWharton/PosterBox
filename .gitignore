@@ -1,0 +1,10 @@
+# IntelliJ IDEA
+/.idea
+
+# Gradle
+/.gradle
+/build
+/reports
+
+# Kotlin Gradle plugin
+/kotlin-js-store
