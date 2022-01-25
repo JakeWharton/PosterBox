@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.browser.document
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Footer
@@ -16,7 +17,35 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun PosterBox(config: Config, posters: List<Poster>) {
+fun PosterBox(config: Config) {
+	val postersState = remember { mutableStateOf<List<Poster>?>(null) }
+	val posters = postersState.value
+
+	LaunchedEffect(config) {
+		// TODO continuously sync remote data
+		postersState.value = loadPosters()
+	}
+
+	if (posters == null) {
+		LoadingPosters()
+	} else if (posters.isEmpty()) {
+		TODO("Empty content")
+	} else {
+		LaunchedEffect(Unit) {
+			val body = document.body!!
+			// Prevent animations for initial content load.
+			body.classList.add("disable-animation")
+			// Wait for the CSS animation time before re-enabling. We use this as an approximation
+			// for how long it takes the browser to render the initial DOM and load the first poster.
+			delay(CssAnimationDuration)
+			body.classList.remove("disable-animation")
+		}
+		PosterDisplay(config, posters)
+	}
+}
+
+@Composable
+fun PosterDisplay(config: Config, posters: List<Poster>) {
 	// Start with the same poster loaded in both positions. The browser should de-duplicate this
 	// request ensuring it is displayed as soon as possible.
 	var posterOne by remember { mutableStateOf(posters[0]) }
