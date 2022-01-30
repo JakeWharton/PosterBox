@@ -7,30 +7,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import io.ktor.client.HttpClient
-import io.ktor.http.Url
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
 @Composable
-fun presentConfigState(client: HttpClient, configUrl: Url): ConfigState {
+fun presentConfigState(client: HttpClient): ConfigState {
 	var config by remember { mutableStateOf<ConfigState>(ConfigState.None()) }
 
-	LaunchedEffect(configUrl) {
+	LaunchedEffect(Unit) {
+		var eTag: String? = null
 		while (isActive) {
-			val lastModified = (config as? ConfigState.Loaded)?.lastModified
-
-			when (val configResponse = loadConfig(client, configUrl, lastModified)) {
+			when (val configResponse = loadConfig(client, eTag)) {
 				is ConfigResponse.Success -> {
 					val newConfigState = ConfigState.Loaded(
-						lastModified = configResponse.lastModified,
 						config = configResponse.config,
 					)
-					console.log("Loaded new config! $newConfigState")
+					console.log("Loaded new config! $eTag")
 					config = newConfigState
+					eTag = configResponse.eTag
 				}
-				ConfigResponse.NotModified -> {
-					console.log("Config has not changed.")
+				is ConfigResponse.NotModified -> {
+					// Nothing to do!
 				}
 				is ConfigResponse.Error -> {
 					console.log("Unable to load config. ${configResponse.error}")
@@ -57,8 +55,7 @@ sealed interface ConfigState {
 	) : ConfigState
 
 	data class Loaded(
-		val lastModified: String?,
-		val config: Config,
+		val config: ClientConfig,
 		override val error: String? = null,
 	) : ConfigState
 }

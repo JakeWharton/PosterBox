@@ -1,0 +1,11 @@
+// Set a deterministic name for the produced JS file which can be referenced from HTML, the
+// server distribution zip, the server startup scripts, etc.
+rootProject.name = "posterbox"
+
+dependencyResolutionManagement {
+	repositories {
+		mavenCentral()
+	}
+}
+
+enableFeaturePreview('VERSION_CATALOGS')

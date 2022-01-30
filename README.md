@@ -27,7 +27,8 @@ itemTransition = "slide-right"
 host = "http://plexms:32800"
 # Plex authentication token (required).
 token = "abc123"
-# Libraries from which to pull posters (optional).
+# Libraries from which to pull posters (optional). No matter the contents of this array,
+# only entries of type "movie" or "show" will be used.
 #  Value: Array of case-sensitive library names or null to use all available libraries.
 #  Default: null
 libraries = [ "Movies", "TV Shows" ]

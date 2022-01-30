@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlinx.browser.document
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Footer
@@ -17,35 +16,15 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun PosterBox(config: Config) {
-	val postersState = remember { mutableStateOf<List<Poster>?>(null) }
-	val posters = postersState.value
-
-	LaunchedEffect(config) {
-		// TODO continuously sync remote data
-		postersState.value = loadPosters()
-	}
-
-	if (posters == null) {
-		LoadingPosters()
-	} else if (posters.isEmpty()) {
-		TODO("Empty content")
-	} else {
-		LaunchedEffect(Unit) {
-			val body = document.body!!
-			// Prevent animations for initial content load.
-			body.classList.add("disable-animation")
-			// Wait for the CSS animation time before re-enabling. We use this as an approximation
-			// for how long it takes the browser to render the initial DOM and load the first poster.
-			delay(CssAnimationDuration)
-			body.classList.remove("disable-animation")
-		}
-		PosterDisplay(config, posters)
-	}
+fun PosterBox(config: ClientConfig) {
+	// TODO handle empty list
+	PosterDisplay(config)
 }
 
 @Composable
-fun PosterDisplay(config: Config, posters: List<Poster>) {
+fun PosterDisplay(config: ClientConfig) {
+	val posters = config.posters
+
 	// Start with the same poster loaded in both positions. The browser should de-duplicate this
 	// request ensuring it is displayed as soon as possible.
 	var posterOne by remember { mutableStateOf(posters[0]) }
@@ -78,8 +57,8 @@ fun PosterDisplay(config: Config, posters: List<Poster>) {
 		PosterHeader("Now Showing")
 	}
 	Main({ classes(transitionClass(config.itemTransition)) }) {
-		PosterImage(posterOne.posterUrl, posterOneActive)
-		PosterImage(posterTwo.posterUrl, !posterOneActive)
+		PosterImage(posterOne.plexPoster, posterOneActive)
+		PosterImage(posterTwo.plexPoster, !posterOneActive)
 	}
 	Footer {
 		PosterFooter(posterOne, posterOneActive)
@@ -96,17 +75,23 @@ private fun PosterHeader(content: String) {
 
 @Composable
 private fun PosterImage(url: String, active: Boolean) {
-	Img(url) { classes(activeClass(active)) }
+	Img("/plexPoster?path=$url") {
+		classes(activeClass(active))
+	}
 }
 
 @Composable
 private fun PosterFooter(poster: Poster, active: Boolean) {
 	Div({ classes(activeClass(active)) }) {
-		Span({ classes(ratingClass(poster.rating)) }) { Text(poster.rating) }
-		Span { Text(poster.productionCompany) }
-		Span { Text("${poster.length}m") }
-		if (poster.score != null) {
-			Span { Text("${poster.score}%") }
+		poster.contentRating?.let { contentRating ->
+			Span({ classes(ratingClass(contentRating)) }) { Text(contentRating) }
+		}
+		poster.studio?.let { studio ->
+			Span { Text(studio) }
+		}
+		Span { Text("${poster.runtime}m") }
+		poster.rating?.let { rating ->
+			Span { Text("$rating%") }
 		}
 		Span { Text(poster.year.toString()) }
 	}
@@ -118,7 +103,7 @@ private fun activeClass(active: Boolean): String {
 
 private fun ratingClass(rating: String): String {
 	return when (rating.lowercase()) {
-		"nr", "unrated", "r", "tv-ma" -> "red"
+		"nr", "not rated", "unrated", "r", "tv-ma" -> "red"
 		"pg-13", "tv-14" -> "orange"
 		"pg", "tv-pg", "tv-y7" -> "blue"
 		"g", "tv-g", "tv-y" -> "green"
@@ -126,12 +111,4 @@ private fun ratingClass(rating: String): String {
 	}
 }
 
-private fun transitionClass(itemTransition: ItemTransition): String {
-	return when (itemTransition) {
-		ItemTransition.None -> "transition-none"
-		ItemTransition.Crossfade -> "transition-crossfade"
-		ItemTransition.Fade -> "transition-fade"
-		ItemTransition.SlideLeft -> "transition-slide-left"
-		ItemTransition.SlideRight -> "transition-slide-right"
-	}
-}
+private fun transitionClass(itemTransition: ItemTransition) = "transition-${itemTransition.string}"

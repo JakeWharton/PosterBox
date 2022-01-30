@@ -6,45 +6,45 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.time.Duration.Companion.seconds
 
-class ConfigTest {
+class ServerConfigTest {
 	@Ignore // TODO https://github.com/akuleshov7/ktoml/issues/94
-	@Test fun emptyConfig() {
-		val expected = Config(
+	@Test fun emptyServerConfig() {
+		val expected = ServerConfig(
 			itemDisplayDuration = 15.seconds,
 			itemTransition = ItemTransition.Fade,
 			plex = null,
 		)
-		val actual = Config.parse("# empty")
+		val actual = ServerConfig.parseFromToml("# empty")
 		assertEquals(expected, actual)
 	}
 
 	@Test fun validTransitions() {
-		val expectedNone = Config(itemTransition = ItemTransition.None)
-		val actualNone = Config.parse("""
+		val expectedNone = ServerConfig(itemTransition = ItemTransition.None)
+		val actualNone = ServerConfig.parseFromToml("""
 			|itemTransition = "none"
 			|""".trimMargin())
 		assertEquals(expectedNone, actualNone)
 
-		val expectedFade = Config(itemTransition = ItemTransition.Fade)
-		val actualFade = Config.parse("""
+		val expectedFade = ServerConfig(itemTransition = ItemTransition.Fade)
+		val actualFade = ServerConfig.parseFromToml("""
 			|itemTransition = "fade"
 			|""".trimMargin())
 		assertEquals(expectedFade, actualFade)
 
-		val expectedCrossfade = Config(itemTransition = ItemTransition.Crossfade)
-		val actualCrossfade = Config.parse("""
+		val expectedCrossfade = ServerConfig(itemTransition = ItemTransition.Crossfade)
+		val actualCrossfade = ServerConfig.parseFromToml("""
 			|itemTransition = "crossfade"
 			|""".trimMargin())
 		assertEquals(expectedCrossfade, actualCrossfade)
 
-		val expectedSlideLeft = Config(itemTransition = ItemTransition.SlideLeft)
-		val actualSlideLeft = Config.parse("""
+		val expectedSlideLeft = ServerConfig(itemTransition = ItemTransition.SlideLeft)
+		val actualSlideLeft = ServerConfig.parseFromToml("""
 			|itemTransition = "slide-left"
 			|""".trimMargin())
 		assertEquals(expectedSlideLeft, actualSlideLeft)
 
-		val expectedSlideRight = Config(itemTransition = ItemTransition.SlideRight)
-		val actualSlideRight = Config.parse("""
+		val expectedSlideRight = ServerConfig(itemTransition = ItemTransition.SlideRight)
+		val actualSlideRight = ServerConfig.parseFromToml("""
 			|itemTransition = "slide-right"
 			|""".trimMargin())
 		assertEquals(expectedSlideRight, actualSlideRight)
@@ -52,7 +52,7 @@ class ConfigTest {
 
 	@Test fun invalidTransitionThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
-			Config.parse("""
+			ServerConfig.parseFromToml("""
 				|itemTransition = "star-wipe"
 				|""".trimMargin())
 		}
@@ -61,7 +61,7 @@ class ConfigTest {
 
 	@Test fun zeroItemDurationThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
-			Config.parse("""
+			ServerConfig.parseFromToml("""
 				|itemDisplayDuration = 0
 				|""".trimMargin())
 		}
@@ -70,7 +70,7 @@ class ConfigTest {
 
 	@Test fun negativeItemDurationThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
-			Config.parse("""
+			ServerConfig.parseFromToml("""
 				|itemDisplayDuration = -2
 				|""".trimMargin())
 		}
@@ -78,8 +78,8 @@ class ConfigTest {
 	}
 
 	@Test fun validDuration() {
-		val expected = Config(itemDisplayDuration = 30.seconds)
-		val actual = Config.parse("""
+		val expected = ServerConfig(itemDisplayDuration = 30.seconds)
+		val actual = ServerConfig.parseFromToml("""
 			|itemDisplayDuration = 30
 			|""".trimMargin())
 		assertEquals(expected, actual)

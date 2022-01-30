@@ -3,8 +3,5 @@
 
 # Gradle
 /.gradle
-/build
+build
 /reports
-
-# Kotlin Gradle plugin
-/kotlin-js-store
