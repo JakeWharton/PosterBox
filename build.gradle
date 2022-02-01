@@ -49,7 +49,7 @@ kotlin {
 			dependencies {
 				implementation(libs.kotlinx.coroutines.core)
 				implementation(libs.ktor.client.js)
-				implementation(libs.jetbrains.compose.web)
+				implementation(libs.jetbrains.compose.web.core)
 			}
 		}
 	}

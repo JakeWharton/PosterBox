@@ -9,9 +9,11 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Footer
+import org.jetbrains.compose.web.dom.H1
 import org.jetbrains.compose.web.dom.Header
-import org.jetbrains.compose.web.dom.Img
 import org.jetbrains.compose.web.dom.Main
+import org.jetbrains.compose.web.dom.Object
+import org.jetbrains.compose.web.dom.P
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
@@ -57,8 +59,8 @@ fun PosterDisplay(config: ClientConfig) {
 		PosterHeader("Now Showing")
 	}
 	Main({ classes(transitionClass(config.itemTransition)) }) {
-		PosterImage(posterOne.plexPoster, posterOneActive)
-		PosterImage(posterTwo.plexPoster, !posterOneActive)
+		PosterImage(posterOne.plexPoster, posterOne.title, posterOneActive)
+		PosterImage(posterTwo.plexPoster, posterTwo.title, !posterOneActive)
 	}
 	Footer {
 		PosterFooter(posterOne, posterOneActive)
@@ -74,9 +76,14 @@ private fun PosterHeader(content: String) {
 }
 
 @Composable
-private fun PosterImage(url: String, active: Boolean) {
-	Img("/plexPoster?path=$url") {
+private fun PosterImage(url: String, title: String, active: Boolean) {
+	Object({
 		classes(activeClass(active))
+		attr("data", "/plexPoster?path=$url")
+		attr("type", "image/jpeg")
+	}) {
+		H1 { Text(title) }
+		P { Text("Unable to load poster") }
 	}
 }
 

@@ -21,6 +21,6 @@ ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktoml = { module = "com.akuleshov7:ktoml-core", version = "0.2.9" }
 jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
-jetbrains-compose-web = { module = "org.jetbrains.compose.web:web-core", version.ref = "compose" }
+jetbrains-compose-web-core = { module = "org.jetbrains.compose.web:web-core", version.ref = "compose" }
 logback = { module = "ch.qos.logback:logback-classic", version = "1.2.5" }
 clikt = { module = "com.github.ajalt.clikt:clikt", version = "3.4.0" }

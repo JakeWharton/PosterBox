@@ -40,6 +40,7 @@ suspend fun loadPosters(client: HttpClient, config: PlexConfig): List<Poster> {
 			val section = json.decodeFromString(PlexResponse.serializer(PlexItems.serializer()), sectionJson)
 			section.mediaContainer.items.map { item ->
 				Poster(
+					title = item.title,
 					studio = item.studio,
 					runtime = ((item.duration / 1000) + 59) / 60,
 					year = item.year,

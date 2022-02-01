@@ -33,6 +33,7 @@ data class ClientConfig(
 
 @Serializable
 data class Poster(
+	val title: String,
 	val studio: String? = null,
 	val runtime: Int,
 	val year: Int,
