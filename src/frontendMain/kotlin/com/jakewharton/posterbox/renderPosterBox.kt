@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlin.random.Random
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Footer
@@ -20,25 +21,34 @@ import org.jetbrains.compose.web.dom.Text
 @Composable
 fun PosterBox(appData: AppData) {
 	// TODO handle empty list
-	PosterDisplay(appData)
+	PosterDisplay(appData.renderSettings, appData.posters)
 }
 
-@Composable
-fun PosterDisplay(appData: AppData) {
-	val renderSettings = appData.renderSettings
-	val posters = appData.posters
+private fun <T> List<T>.randomItem(): T = get(Random.nextInt(size))
 
+@Composable
+fun PosterDisplay(renderSettings: RenderSettings, posters: List<Poster>) {
 	// Start with the same poster loaded in both positions. The browser should de-duplicate this
 	// request ensuring it is displayed as soon as possible.
-	var posterOne by remember { mutableStateOf(posters[0]) }
-	var posterTwo by remember { mutableStateOf(posters[0]) }
+	var posterOne by remember { mutableStateOf(posters.randomItem()) }
+	var posterTwo by remember { mutableStateOf(posterOne) }
 	var posterOneActive by remember { mutableStateOf(true) }
 
 	if (posters.size > 1) {
-		LaunchedEffect(appData, posters) {
-			var nextPosterIndex = 1
+		val recentlySeenPosters = remember { ArrayDeque<Poster>() }
+		val recentlySeenMaxSize = posters.size / 4
+
+		LaunchedEffect(renderSettings, posters) {
 			while (true) {
-				val nextPoster = posters[nextPosterIndex]
+				val nextPoster = posters.randomItem()
+				if (nextPoster in recentlySeenPosters) {
+					continue // Try again.
+				}
+				if (recentlySeenPosters.size >= recentlySeenMaxSize) {
+					recentlySeenPosters.removeFirst()
+				}
+				recentlySeenPosters.addLast(nextPoster)
+
 				if (posterOneActive) {
 					posterTwo = nextPoster
 				} else {
@@ -48,10 +58,6 @@ fun PosterDisplay(appData: AppData) {
 
 				posterOneActive = !posterOneActive
 				delay(CssAnimationDuration)
-
-				if (++nextPosterIndex == posters.size) {
-					nextPosterIndex = 0
-				}
 			}
 		}
 	}
