@@ -18,14 +18,15 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun PosterBox(config: ClientConfig) {
+fun PosterBox(appData: AppData) {
 	// TODO handle empty list
-	PosterDisplay(config)
+	PosterDisplay(appData)
 }
 
 @Composable
-fun PosterDisplay(config: ClientConfig) {
-	val posters = config.posters
+fun PosterDisplay(appData: AppData) {
+	val renderSettings = appData.renderSettings
+	val posters = appData.posters
 
 	// Start with the same poster loaded in both positions. The browser should de-duplicate this
 	// request ensuring it is displayed as soon as possible.
@@ -34,7 +35,7 @@ fun PosterDisplay(config: ClientConfig) {
 	var posterOneActive by remember { mutableStateOf(true) }
 
 	if (posters.size > 1) {
-		LaunchedEffect(config, posters) {
+		LaunchedEffect(appData, posters) {
 			var nextPosterIndex = 1
 			while (true) {
 				val nextPoster = posters[nextPosterIndex]
@@ -43,7 +44,7 @@ fun PosterDisplay(config: ClientConfig) {
 				} else {
 					posterOne = nextPoster
 				}
-				delay(config.itemDisplayDuration)
+				delay(renderSettings.itemDisplayDuration)
 
 				posterOneActive = !posterOneActive
 				delay(CssAnimationDuration)
@@ -58,7 +59,7 @@ fun PosterDisplay(config: ClientConfig) {
 	Header {
 		PosterHeader("Now Showing")
 	}
-	Main({ classes(transitionClass(config.itemTransition)) }) {
+	Main({ classes(transitionClass(renderSettings.itemTransition)) }) {
 		PosterImage(posterOne.plexPoster, posterOne.title, posterOneActive)
 		PosterImage(posterTwo.plexPoster, posterTwo.title, !posterOneActive)
 	}
@@ -79,7 +80,7 @@ private fun PosterHeader(content: String) {
 private fun PosterImage(url: String, title: String, active: Boolean) {
 	Object({
 		classes(activeClass(active))
-		attr("data", "/plexPoster?path=$url")
+		attr("data", "${Poster.route}?path=$url")
 		attr("type", "image/jpeg")
 	}) {
 		H1 { Text(title) }

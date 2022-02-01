@@ -12,50 +12,49 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
 @Composable
-fun presentConfigState(client: HttpClient): ConfigState {
-	var config by remember { mutableStateOf<ConfigState>(ConfigState.None()) }
+fun presentAppState(client: HttpClient): AppState {
+	var appState by remember { mutableStateOf<AppState>(AppState.None()) }
 
 	LaunchedEffect(Unit) {
 		var eTag: String? = null
 		while (isActive) {
-			when (val configResponse = loadConfig(client, eTag)) {
-				is ConfigResponse.Success -> {
-					val newConfigState = ConfigState.Loaded(
-						config = configResponse.config,
+			when (val appDataResponse = loadAppData(client, eTag)) {
+				is AppDataResponse.Success -> {
+					val newAppState = AppState.Loaded(
+						appData = appDataResponse.config,
 					)
-					console.log("Loaded new config! ${configResponse.eTag}")
-					config = newConfigState
-					eTag = configResponse.eTag
+					console.log("Loaded new config! ${appDataResponse.eTag}")
+					appState = newAppState
+					eTag = appDataResponse.eTag
 				}
-				is ConfigResponse.NotModified -> {
+				is AppDataResponse.NotModified -> {
 					// Nothing to do!
 				}
-				is ConfigResponse.Error -> {
-					console.log("Unable to load config. ${configResponse.error}")
-					config = when (val oldConfig = config) {
-						is ConfigState.None -> oldConfig.copy(error = configResponse.error)
-						is ConfigState.Loaded -> oldConfig.copy(error = configResponse.error)
+				is AppDataResponse.Error -> {
+					console.log("Unable to load config. ${appDataResponse.error}")
+					appState = when (val oldAppState = appState) {
+						is AppState.None -> oldAppState.copy(error = appDataResponse.error)
+						is AppState.Loaded -> oldAppState.copy(error = appDataResponse.error)
 					}
 				}
 			}
 
-			val refresh = (config as? ConfigState.Loaded)?.config?.itemDisplayDuration ?: 15.seconds
-			delay(refresh)
+			delay(15.seconds)
 		}
 	}
 
-	return config
+	return appState
 }
 
-sealed interface ConfigState {
+sealed interface AppState {
 	val error: String?
 
 	data class None(
 		override val error: String? = null,
-	) : ConfigState
+	) : AppState
 
 	data class Loaded(
-		val config: ClientConfig,
+		val appData: AppData,
 		override val error: String? = null,
-	) : ConfigState
+	) : AppState
 }

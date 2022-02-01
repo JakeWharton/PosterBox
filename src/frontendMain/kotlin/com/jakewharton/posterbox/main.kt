@@ -22,12 +22,12 @@ fun main() {
 	val client = HttpClient(Js)
 
 	renderComposable(body) {
-		when (val configState = presentConfigState(client)) {
-			is ConfigState.None -> {
+		when (val appState = presentAppState(client)) {
+			is AppState.None -> {
 				// TODO handle errors in this state
 				LoadingConfig()
 			}
-			is ConfigState.Loaded -> {
+			is AppState.Loaded -> {
 				LaunchedEffect(Unit) {
 					// Prevent animations for initial content load.
 					body.classList.add("disable-animation")
@@ -38,7 +38,7 @@ fun main() {
 				}
 
 				// TODO handle errors in this state
-				PosterBox(configState.config)
+				PosterBox(appState.appData)
 			}
 		}
 	}

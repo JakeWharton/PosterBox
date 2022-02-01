@@ -1,7 +1,6 @@
 @file:JvmName("Main")
 package com.jakewharton.posterbox
 
-import com.akuleshov7.ktoml.Toml
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.help
@@ -89,13 +88,15 @@ private class PosterBoxCommand(
 							if (newServerConfig.plex != null) {
 								// TODO handle errors
 								val newPosters = loadPosters(httpClient, newServerConfig.plex)
-								val clientConfig = ClientConfig(
-									itemDisplayDuration = newServerConfig.itemDisplayDuration,
-									itemTransition = newServerConfig.itemTransition,
+								val appData = AppData(
+									renderSettings = RenderSettings(
+										itemDisplayDuration = newServerConfig.itemDisplayDuration,
+										itemTransition = newServerConfig.itemTransition,
+									),
 									posters = newPosters,
 								)
-								val clientConfigJson = clientConfig.encodeToJson()
-								state = HttpState(eTag, newServerConfig, clientConfigJson)
+								val appDataJson = appData.encodeToJson()
+								state = HttpState(eTag, newServerConfig, appDataJson)
 							}
 						}
 					}
@@ -104,7 +105,7 @@ private class PosterBoxCommand(
 			}
 
 			routing {
-				get("/config.json") {
+				get(AppData.route) {
 					@Suppress("NAME_SHADOWING") // Read once to avoid tearing state.
 					val state = state
 					if (state == null) {
@@ -113,10 +114,10 @@ private class PosterBoxCommand(
 						call.respond(HttpStatusCode.NotModified)
 					} else {
 						call.response.etag(state.eTag)
-						call.respondText(state.clientConfigJson)
+						call.respondText(state.appDataJson)
 					}
 				}
-				get("/plexPoster") {
+				get(Poster.route) {
 					@Suppress("NAME_SHADOWING") // Read once to avoid tearing state.
 					val state = state
 					if (state != null) {
@@ -155,7 +156,7 @@ private class PosterBoxCommand(
 	private data class HttpState(
 		val eTag: String,
 		val serverConfig: ServerConfig,
-		val clientConfigJson: String,
+		val appDataJson: String,
 		val errors: List<String> = emptyList(),
 	)
 

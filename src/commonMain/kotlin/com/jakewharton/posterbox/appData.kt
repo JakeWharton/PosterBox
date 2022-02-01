@@ -11,11 +11,8 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class ClientConfig(
-	@Serializable(PositiveDurationSecondsSerializer::class)
-	val itemDisplayDuration: Duration = 15.seconds,
-	@Serializable(ItemTransitionSerializer::class)
-	val itemTransition: ItemTransition = ItemTransition.Fade,
+data class AppData(
+	val renderSettings: RenderSettings,
 	val posters: List<Poster>,
 ) {
 	fun encodeToJson(): String {
@@ -24,12 +21,21 @@ data class ClientConfig(
 
 	companion object {
 		private val serializer = Json
+		const val route = "/data.json"
 
-		fun decodeFromJson(string: String): ClientConfig {
+		fun decodeFromJson(string: String): AppData {
 			return serializer.decodeFromString(serializer(), string)
 		}
 	}
 }
+
+@Serializable
+data class RenderSettings(
+	@Serializable(PositiveDurationSecondsSerializer::class)
+	val itemDisplayDuration: Duration = 15.seconds,
+	@Serializable(ItemTransitionSerializer::class)
+	val itemTransition: ItemTransition = ItemTransition.Fade,
+)
 
 @Serializable
 data class Poster(
@@ -40,7 +46,11 @@ data class Poster(
 	val contentRating: String? = null,
 	val rating: Int? = null,
 	val plexPoster: String,
-)
+) {
+	companion object {
+		const val route = "/plexPoster"
+	}
+}
 
 enum class ItemTransition(val string: String) {
 	None("none"),
