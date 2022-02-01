@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import kotlin.random.Random
 import kotlinx.coroutines.delay
@@ -21,13 +22,18 @@ import org.jetbrains.compose.web.dom.Text
 @Composable
 fun PosterBox(appData: AppData) {
 	// TODO handle empty list
-	PosterDisplay(appData.renderSettings, appData.posters)
+	PosterDisplay(appData)
 }
 
 private fun <T> List<T>.randomItem(): T = get(Random.nextInt(size))
 
 @Composable
-fun PosterDisplay(renderSettings: RenderSettings, posters: List<Poster>) {
+fun PosterDisplay(appData: AppData) {
+	// Ensure effects capture state which can be re-read rather than raw values. This ensures changes
+	// to data does not restart the update loop and are merely reflected on next iteration instead.
+	val renderSettings by rememberUpdatedState(appData.renderSettings)
+	val posters by rememberUpdatedState(appData.posters)
+
 	// Start with the same poster loaded in both positions. The browser should de-duplicate this
 	// request ensuring it is displayed as soon as possible.
 	var posterOne by remember { mutableStateOf(posters.randomItem()) }
@@ -35,16 +41,14 @@ fun PosterDisplay(renderSettings: RenderSettings, posters: List<Poster>) {
 	var posterOneActive by remember { mutableStateOf(true) }
 
 	if (posters.size > 1) {
-		val recentlySeenPosters = remember { ArrayDeque<Poster>() }
-		val recentlySeenMaxSize = posters.size / 4
-
-		LaunchedEffect(renderSettings, posters) {
+		LaunchedEffect(Unit) {
+			val recentlySeenPosters = ArrayDeque<Poster>()
 			while (true) {
 				val nextPoster = posters.randomItem()
 				if (nextPoster in recentlySeenPosters) {
 					continue // Try again.
 				}
-				if (recentlySeenPosters.size >= recentlySeenMaxSize) {
+				while (recentlySeenPosters.size >= posters.size / 4) {
 					recentlySeenPosters.removeFirst()
 				}
 				recentlySeenPosters.addLast(nextPoster)
