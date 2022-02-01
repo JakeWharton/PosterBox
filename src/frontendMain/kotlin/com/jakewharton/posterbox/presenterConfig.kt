@@ -23,7 +23,7 @@ fun presentConfigState(client: HttpClient): ConfigState {
 					val newConfigState = ConfigState.Loaded(
 						config = configResponse.config,
 					)
-					console.log("Loaded new config! $eTag")
+					console.log("Loaded new config! ${configResponse.eTag}")
 					config = newConfigState
 					eTag = configResponse.eTag
 				}
