@@ -45,7 +45,7 @@ suspend fun loadPosters(client: HttpClient, config: PlexConfig): List<Poster> {
 					runtime = ((item.duration / 1000) + 59) / 60,
 					year = item.year,
 					contentRating = item.contentRating,
-					rating = (item.rating ?: item.audienceRating)?.let { (it * 10).toInt() },
+					rating = (item.audienceRating ?: item.rating)?.let { (it * 10).toInt() },
 					plexPoster = item.thumb,
 				)
 			}
