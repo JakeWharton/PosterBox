@@ -22,11 +22,11 @@ footer div { position: absolute; top: 0; height: 100%; width: 100%; display: fle
 
 /* Theme */
 header { color: #FAFAD2; font-family: 'Limelight'; }
-footer span { background-color: #343a40; padding: 1px 8px; display: inline-block; margin-left: 2px; border-radius: 10rem; }
-footer span.green { background-color: #116332; }
-footer span.blue { background-color: #114263; }
-footer span.orange { background-color: #633211; }
-footer span.red { background-color: #631119; }
+footer span { background-color: #343a40; padding: 2px 8px; display: inline-block; margin-left: 4px; border-radius: 10rem; }
+footer span.green { background-color: #1b6845; }
+footer span.blue { background-color: #4e53af; }
+footer span.orange { background-color: #9b5b25; }
+footer span.red { background-color: #942443; }
 
 @font-face {
 	font-family: 'Limelight';
