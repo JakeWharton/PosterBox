@@ -32,9 +32,9 @@ data class AppData(
 @Serializable
 data class RenderSettings(
 	@Serializable(DurationSecondsSerializer::class)
-	val itemDisplayDuration: Duration = 15.seconds,
+	val itemDisplayDuration: Duration,
 	@Serializable(ItemTransitionSerializer::class)
-	val itemTransition: ItemTransition = ItemTransition.Fade,
+	val itemTransition: ItemTransition,
 )
 
 @Serializable
