@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class ConfigTest {
 	@Ignore // TODO https://github.com/akuleshov7/ktoml/issues/94
-	@Test fun emptyServerConfig() {
+	@Test fun emptyConfig() {
 		val expected = Config(
 			itemDisplayDuration = 15.seconds,
 			itemTransition = ItemTransition.Fade,
@@ -22,7 +22,7 @@ class ConfigTest {
 		assertEquals(expected, actual)
 	}
 
-	@Test fun validTransitions() {
+	@Test fun itemTransitionValid() {
 		val expectedNone = Config(itemTransition = ItemTransition.None)
 		val actualNone = Config.parseFromToml("""
 			|itemTransition = "none"
@@ -54,7 +54,7 @@ class ConfigTest {
 		assertEquals(expectedSlideRight, actualSlideRight)
 	}
 
-	@Test fun invalidTransitionThrows() {
+	@Test fun itemTransitionInvalidThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
 			Config.parseFromToml("""
 				|itemTransition = "star-wipe"
@@ -63,7 +63,7 @@ class ConfigTest {
 		assertEquals("Unknown item transition name: star-wipe", t.message)
 	}
 
-	@Test fun itemDurationZeroThrows() {
+	@Test fun itemDisplayDurationZeroThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
 			Config.parseFromToml("""
 				|itemDisplayDuration = "PT0S"
@@ -72,7 +72,7 @@ class ConfigTest {
 		assertEquals("Item display duration must be positive: 0s", t.message)
 	}
 
-	@Test fun itemDurationNegativeThrows() {
+	@Test fun itemDisplayDurationNegativeThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
 			Config.parseFromToml("""
 				|itemDisplayDuration = "-PT2S"
@@ -81,7 +81,7 @@ class ConfigTest {
 		assertEquals("Item display duration must be positive: -2s", t.message)
 	}
 
-	@Test fun itemDurationBadFormatThrows() {
+	@Test fun itemDisplayDurationBadFormatThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
 			Config.parseFromToml("""
 				|itemDisplayDuration = "5m10s"
@@ -90,7 +90,7 @@ class ConfigTest {
 		assertEquals("Invalid ISO duration string format: '5m10s'.", t.message)
 	}
 
-	@Test fun validDuration() {
+	@Test fun itemDisplayDurationValid() {
 		val expected = Config(itemDisplayDuration = 30.seconds)
 		val actual = Config.parseFromToml("""
 			|itemDisplayDuration = "PT30S"
@@ -118,7 +118,7 @@ class ConfigTest {
 		assertTrue("Missing the required field <token>" in t.message!!)
 	}
 
-	@Test fun validMinimalPlexConfig() {
+	@Test fun plexConfigMinimalValid() {
 		val expected = Config(plex = Plex("http://example.com", "abc123"))
 		val actual = Config.parseFromToml("""
 			|[plex]
@@ -152,7 +152,7 @@ class ConfigTest {
 		assertEquals("Minimum rating must be in the range [0, 100]: 102", t.message)
 	}
 
-	@Test fun validMinimumRating() {
+	@Test fun minimumRatingValid() {
 		val expected = Config(plex = Plex("http://example.com", "abc123", minimumRating = 40))
 		val actual = Config.parseFromToml("""
 				|[plex]
@@ -199,7 +199,7 @@ class ConfigTest {
 		assertEquals("Invalid ISO duration string format: '5m10s'.", t.message)
 	}
 
-	@Test fun validSyncIntervalDuration() {
+	@Test fun syncIntervalDurationValid() {
 		val expected =
 			Config(plex = Plex("http://example.com", "abc123", syncIntervalDuration = 10.minutes))
 		val actual = Config.parseFromToml("""
