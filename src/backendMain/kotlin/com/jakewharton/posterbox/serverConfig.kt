@@ -27,4 +27,11 @@ data class PlexConfig(
 	val host: String,
 	val token: String,
 	val libraries: Set<String>? = null,
-)
+	val minimumRating: Long = 0,
+) {
+	init {
+		require(minimumRating in 0L..100L) {
+			"Minimum rating must be in the range [0, 100]: $minimumRating"
+		}
+	}
+}

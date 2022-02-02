@@ -38,18 +38,24 @@ suspend fun loadPosters(client: HttpClient, config: PlexConfig): List<Poster> {
 			// TODO error handling
 			val sectionJson = sectionResponse.readText()
 			val section = json.decodeFromString(PlexResponse.serializer(PlexItems.serializer()), sectionJson)
-			section.mediaContainer.items.map { item ->
-				Poster(
-					title = item.title,
-					studio = item.studio,
-					runtime = ((item.duration / 1000) + 59) / 60,
-					year = item.year,
-					contentRating = item.contentRating,
-					rating = (item.audienceRating ?: item.rating)?.let { (it * 10).toInt() },
-					plexPoster = item.thumb,
-				)
-			}
+			section.mediaContainer.items
+				.filter { item -> (item.computedRating() ?: 0) >= config.minimumRating }
+				.map { item ->
+					Poster(
+						title = item.title,
+						studio = item.studio,
+						runtime = ((item.duration / 1000) + 59) / 60,
+						year = item.year,
+						contentRating = item.contentRating,
+						rating = item.computedRating(),
+						plexPoster = item.thumb,
+					)
+				}
 		}
+}
+
+private fun PlexItem.computedRating(): Int? {
+	return (audienceRating ?: rating)?.let { (it * 10).toInt() }
 }
 
 @Serializable

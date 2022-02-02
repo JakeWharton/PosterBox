@@ -32,6 +32,11 @@ token = "abc123"
 #  Value: Array of case-sensitive library names or null to use all available libraries.
 #  Default: null
 libraries = [ "Movies", "TV Shows" ]
+# Minimum rating cut-off for poster inclusion (optional). Content with no rating is
+# treated as having a rating of 0. Audience rating takes precedence over critic rating.
+#  Value: Whole number in the range [0, 100]
+#  Default: 0
+minimumRating = 40
 ```
 
 

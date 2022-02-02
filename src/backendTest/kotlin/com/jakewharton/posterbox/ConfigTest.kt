@@ -84,4 +84,41 @@ class ServerConfigTest {
 			|""".trimMargin())
 		assertEquals(expected, actual)
 	}
+
+	@Test fun minimumRatingTooLowThrows() {
+		val t = assertFailsWith<IllegalArgumentException> {
+			ServerConfig.parseFromToml("""
+				|[plex]
+				|host = "http://example.com"
+				|token = "abc123"
+				|minimumRating = -2
+				|""".trimMargin())
+		}
+		assertEquals("Minimum rating must be in the range [0, 100]: -2", t.message)
+	}
+
+	@Test fun minimumRatingTooHighThrows() {
+		val t = assertFailsWith<IllegalArgumentException> {
+			ServerConfig.parseFromToml("""
+				|[plex]
+				|host = "http://example.com"
+				|token = "abc123"
+				|minimumRating = 102
+				|""".trimMargin())
+		}
+		assertEquals("Minimum rating must be in the range [0, 100]: 102", t.message)
+	}
+
+	@Test fun validMinimumRating() {
+		val expected = ServerConfig(
+			plex = PlexConfig(host = "http://example.com", token = "abc123", minimumRating = 40)
+		)
+		val actual = ServerConfig.parseFromToml("""
+				|[plex]
+				|host = "http://example.com"
+				|token = "abc123"
+				|minimumRating = 40
+				|""".trimMargin())
+		assertEquals(expected, actual)
+	}
 }
