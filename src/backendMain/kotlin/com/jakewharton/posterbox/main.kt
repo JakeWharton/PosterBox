@@ -30,7 +30,6 @@ import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.util.UUID
 import kotlin.io.path.readText
-import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -85,7 +84,7 @@ private class PosterBoxCommand(
 							)
 							posters = newPosters
 						}
-						delay(15.minutes)
+						delay(config.plex.syncIntervalDuration)
 					}
 				}
 			}

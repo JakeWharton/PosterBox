@@ -9,10 +9,11 @@ All top-level keys and sections are optional.
 An empty configuration file is technically valid, but will result in no content being displayed.
 
 ```toml
-# Item display duration in seconds (optional).
-#  Value: must be positive integer
-#  Default: 15
-itemDisplayDuration = "15"
+# Duration each item is displayed as an ISO 8601 duration string (optional).
+# See https://en.wikipedia.org/wiki/ISO_8601#Durations.
+#  Value: must be positive duration
+#  Default: "PT15S" (15 seconds)
+itemDisplayDuration = "PT10S"
 
 # Transition between items (optional).
 #  Value: "none", "fade", "crossfade", "slide-right", or "slide-left"
@@ -37,6 +38,11 @@ libraries = [ "Movies", "TV Shows" ]
 #  Value: Whole number in the range [0, 100]
 #  Default: 0
 minimumRating = 40
+# Duration between synchronizing items from Plex server as an ISO 8601 duration
+# string (optional). See https://en.wikipedia.org/wiki/ISO_8601#Durations.
+#  Value: must be positive duration
+#  Default: "PT15M" (15 minutes)
+syncIntervalDuration = "PT30M"
 ```
 
 

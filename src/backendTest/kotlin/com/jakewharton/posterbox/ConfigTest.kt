@@ -7,6 +7,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class ConfigTest {
@@ -62,28 +63,37 @@ class ConfigTest {
 		assertEquals("Unknown item transition name: star-wipe", t.message)
 	}
 
-	@Test fun zeroItemDurationThrows() {
+	@Test fun itemDurationZeroThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
 			Config.parseFromToml("""
-				|itemDisplayDuration = 0
+				|itemDisplayDuration = "PT0S"
 				|""".trimMargin())
 		}
-		assertEquals("Duration seconds must be positive: 0s", t.message)
+		assertEquals("Item display duration must be positive: 0s", t.message)
 	}
 
-	@Test fun negativeItemDurationThrows() {
+	@Test fun itemDurationNegativeThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
 			Config.parseFromToml("""
-				|itemDisplayDuration = -2
+				|itemDisplayDuration = "-PT2S"
 				|""".trimMargin())
 		}
-		assertEquals("Duration seconds must be positive: -2s", t.message)
+		assertEquals("Item display duration must be positive: -2s", t.message)
+	}
+
+	@Test fun itemDurationBadFormatThrows() {
+		val t = assertFailsWith<IllegalArgumentException> {
+			Config.parseFromToml("""
+				|itemDisplayDuration = "5m10s"
+				|""".trimMargin())
+		}
+		assertEquals("Invalid ISO duration string format: '5m10s'.", t.message)
 	}
 
 	@Test fun validDuration() {
 		val expected = Config(itemDisplayDuration = 30.seconds)
 		val actual = Config.parseFromToml("""
-			|itemDisplayDuration = 30
+			|itemDisplayDuration = "PT30S"
 			|""".trimMargin())
 		assertEquals(expected, actual)
 	}
@@ -149,6 +159,54 @@ class ConfigTest {
 				|host = "http://example.com"
 				|token = "abc123"
 				|minimumRating = 40
+				|""".trimMargin())
+		assertEquals(expected, actual)
+	}
+
+	@Test fun syncIntervalZeroThrows() {
+		val t = assertFailsWith<IllegalArgumentException> {
+			Config.parseFromToml("""
+				|[plex]
+				|host = "http://example.com"
+				|token = "abc123"
+				|syncIntervalDuration = "PT0S"
+				|""".trimMargin())
+		}
+		assertEquals("Sync interval duration must be positive: 0s", t.message)
+	}
+
+	@Test fun syncIntervalNegativeThrows() {
+		val t = assertFailsWith<IllegalArgumentException> {
+			Config.parseFromToml("""
+				|[plex]
+				|host = "http://example.com"
+				|token = "abc123"
+				|syncIntervalDuration = "-PT2S"
+				|""".trimMargin())
+		}
+		assertEquals("Sync interval duration must be positive: -2s", t.message)
+	}
+
+	@Test fun syncIntervalBadFormatThrows() {
+		val t = assertFailsWith<IllegalArgumentException> {
+			Config.parseFromToml("""
+				|[plex]
+				|host = "http://example.com"
+				|token = "abc123"
+				|syncIntervalDuration = "5m10s"
+				|""".trimMargin())
+		}
+		assertEquals("Invalid ISO duration string format: '5m10s'.", t.message)
+	}
+
+	@Test fun validSyncIntervalDuration() {
+		val expected =
+			Config(plex = Plex("http://example.com", "abc123", syncIntervalDuration = 10.minutes))
+		val actual = Config.parseFromToml("""
+				|[plex]
+				|host = "http://example.com"
+				|token = "abc123"
+				|syncIntervalDuration = "PT10M"
 				|""".trimMargin())
 		assertEquals(expected, actual)
 	}

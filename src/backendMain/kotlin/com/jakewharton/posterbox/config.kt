@@ -2,12 +2,13 @@ package com.jakewharton.posterbox
 
 import com.akuleshov7.ktoml.Toml
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Config(
-	@Serializable(DurationSecondsSerializer::class)
+	@Serializable(DurationSerializer::class)
 	val itemDisplayDuration: Duration = 15.seconds,
 	@Serializable(ItemTransitionSerializer::class)
 	val itemTransition: ItemTransition = ItemTransition.Fade,
@@ -15,7 +16,7 @@ data class Config(
 ) {
 	init {
 		require(itemDisplayDuration.isPositive()) {
-			"Duration seconds must be positive: $itemDisplayDuration"
+			"Item display duration must be positive: $itemDisplayDuration"
 		}
 	}
 
@@ -33,10 +34,15 @@ data class Config(
 		val token: String,
 		val libraries: Set<String>? = null,
 		val minimumRating: Long = 0,
+		@Serializable(DurationSerializer::class)
+		val syncIntervalDuration: Duration = 15.minutes,
 	) {
 		init {
 			require(minimumRating in 0L..100L) {
 				"Minimum rating must be in the range [0, 100]: $minimumRating"
+			}
+			require(syncIntervalDuration.isPositive()) {
+				"Sync interval duration must be positive: $syncIntervalDuration"
 			}
 		}
 	}

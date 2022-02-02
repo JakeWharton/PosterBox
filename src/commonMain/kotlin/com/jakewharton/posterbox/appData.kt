@@ -1,7 +1,6 @@
 package com.jakewharton.posterbox
 
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -31,7 +30,7 @@ data class AppData(
 
 @Serializable
 data class RenderSettings(
-	@Serializable(DurationSecondsSerializer::class)
+	@Serializable(DurationSerializer::class)
 	val itemDisplayDuration: Duration,
 	@Serializable(ItemTransitionSerializer::class)
 	val itemTransition: ItemTransition,
@@ -62,15 +61,15 @@ enum class ItemTransition(val string: String) {
 	SlideRight("slide-right"),
 }
 
-object DurationSecondsSerializer : KSerializer<Duration> {
-	override val descriptor = PrimitiveSerialDescriptor("Duration", PrimitiveKind.LONG)
+object DurationSerializer : KSerializer<Duration> {
+	override val descriptor = PrimitiveSerialDescriptor("IsoDuration", PrimitiveKind.LONG)
 
 	override fun deserialize(decoder: Decoder): Duration {
-		return decoder.decodeLong().seconds
+		return Duration.parseIsoString(decoder.decodeString())
 	}
 
 	override fun serialize(encoder: Encoder, value: Duration) {
-		encoder.encodeLong(value.inWholeSeconds)
+		encoder.encodeString(value.toIsoString())
 	}
 }
 
