@@ -1,9 +1,11 @@
 package com.jakewharton.posterbox
 
+import com.akuleshov7.ktoml.exceptions.KtomlException
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 class ServerConfigTest {
@@ -85,6 +87,36 @@ class ServerConfigTest {
 		assertEquals(expected, actual)
 	}
 
+	@Test fun plexHostMissingThrows() {
+		val t = assertFailsWith<KtomlException> {
+			ServerConfig.parseFromToml("""
+			|[plex]
+			|token = "abc123"
+			|""".trimMargin())
+		}
+		assertTrue("Missing the required field <host>" in t.message!!)
+	}
+
+	@Test fun plexTokenMissingThrows() {
+		val t = assertFailsWith<KtomlException> {
+			ServerConfig.parseFromToml("""
+			|[plex]
+			|host = "http://example.com"
+			|""".trimMargin())
+		}
+		assertTrue("Missing the required field <token>" in t.message!!)
+	}
+
+	@Test fun validMinimalPlexConfig() {
+		val expected = ServerConfig(plex = PlexConfig("http://example.com", "abc123"))
+		val actual = ServerConfig.parseFromToml("""
+			|[plex]
+			|host = "http://example.com"
+			|token = "abc123"
+			|""".trimMargin())
+		assertEquals(expected, actual)
+	}
+
 	@Test fun minimumRatingTooLowThrows() {
 		val t = assertFailsWith<IllegalArgumentException> {
 			ServerConfig.parseFromToml("""
@@ -110,9 +142,8 @@ class ServerConfigTest {
 	}
 
 	@Test fun validMinimumRating() {
-		val expected = ServerConfig(
-			plex = PlexConfig(host = "http://example.com", token = "abc123", minimumRating = 40)
-		)
+		val expected =
+			ServerConfig(plex = PlexConfig("http://example.com", "abc123", minimumRating = 40))
 		val actual = ServerConfig.parseFromToml("""
 				|[plex]
 				|host = "http://example.com"
