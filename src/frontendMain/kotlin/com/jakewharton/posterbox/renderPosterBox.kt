@@ -43,6 +43,8 @@ fun PosterDisplay(appData: AppData) {
 	if (posters.size > 1) {
 		LaunchedEffect(Unit) {
 			val recentlySeenPosters = ArrayDeque<Poster>()
+			recentlySeenPosters.addLast(posterOne)
+
 			while (true) {
 				val nextPoster = posters.randomItem()
 				if (nextPoster in recentlySeenPosters) {
