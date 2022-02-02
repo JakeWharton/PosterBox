@@ -7,12 +7,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ServerConfig(
-	@Serializable(PositiveDurationSecondsSerializer::class)
+	@Serializable(DurationSecondsSerializer::class)
 	val itemDisplayDuration: Duration = 15.seconds,
 	@Serializable(ItemTransitionSerializer::class)
 	val itemTransition: ItemTransition = ItemTransition.Fade,
 	val plex: PlexConfig? = null,
 ) {
+	init {
+		require(itemDisplayDuration.isPositive()) {
+			"Duration seconds must be positive: $itemDisplayDuration"
+		}
+	}
+
 	companion object {
 		private val serializer = Toml
 

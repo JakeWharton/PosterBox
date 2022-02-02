@@ -31,7 +31,7 @@ data class AppData(
 
 @Serializable
 data class RenderSettings(
-	@Serializable(PositiveDurationSecondsSerializer::class)
+	@Serializable(DurationSecondsSerializer::class)
 	val itemDisplayDuration: Duration = 15.seconds,
 	@Serializable(ItemTransitionSerializer::class)
 	val itemTransition: ItemTransition = ItemTransition.Fade,
@@ -60,17 +60,14 @@ enum class ItemTransition(val string: String) {
 	SlideRight("slide-right"),
 }
 
-object PositiveDurationSecondsSerializer : KSerializer<Duration> {
+object DurationSecondsSerializer : KSerializer<Duration> {
 	override val descriptor = PrimitiveSerialDescriptor("Duration", PrimitiveKind.LONG)
 
 	override fun deserialize(decoder: Decoder): Duration {
-		val seconds = decoder.decodeLong()
-		require(seconds > 0) { "Duration seconds must be greater than zero: $seconds" }
-		return seconds.seconds
+		return decoder.decodeLong().seconds
 	}
 
 	override fun serialize(encoder: Encoder, value: Duration) {
-		require(value.isPositive()) { "Duration must be positive: $value" }
 		encoder.encodeLong(value.inWholeSeconds)
 	}
 }

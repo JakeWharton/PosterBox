@@ -67,7 +67,7 @@ class ServerConfigTest {
 				|itemDisplayDuration = 0
 				|""".trimMargin())
 		}
-		assertEquals("Duration seconds must be greater than zero: 0", t.message)
+		assertEquals("Duration seconds must be positive: 0s", t.message)
 	}
 
 	@Test fun negativeItemDurationThrows() {
@@ -76,7 +76,7 @@ class ServerConfigTest {
 				|itemDisplayDuration = -2
 				|""".trimMargin())
 		}
-		assertEquals("Duration seconds must be greater than zero: -2", t.message)
+		assertEquals("Duration seconds must be positive: -2s", t.message)
 	}
 
 	@Test fun validDuration() {
