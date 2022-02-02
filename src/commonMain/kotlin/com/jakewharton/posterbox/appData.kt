@@ -41,9 +41,11 @@ data class RenderSettings(
 data class Poster(
 	val title: String,
 	val studio: String? = null,
+	/** In minutes */
 	val runtime: Int,
 	val year: Int,
 	val contentRating: String? = null,
+	/** Range `[0,100]` */
 	val rating: Int? = null,
 	val plexPoster: String,
 ) {

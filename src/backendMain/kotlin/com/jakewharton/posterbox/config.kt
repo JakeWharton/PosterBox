@@ -6,12 +6,12 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ServerConfig(
+data class Config(
 	@Serializable(DurationSecondsSerializer::class)
 	val itemDisplayDuration: Duration = 15.seconds,
 	@Serializable(ItemTransitionSerializer::class)
 	val itemTransition: ItemTransition = ItemTransition.Fade,
-	val plex: PlexConfig? = null,
+	val plex: Plex? = null,
 ) {
 	init {
 		require(itemDisplayDuration.isPositive()) {
@@ -22,22 +22,22 @@ data class ServerConfig(
 	companion object {
 		private val serializer = Toml
 
-		fun parseFromToml(string: String): ServerConfig {
+		fun parseFromToml(string: String): Config {
 			return serializer.decodeFromString(serializer(), string)
 		}
 	}
-}
 
-@Serializable
-data class PlexConfig(
-	val host: String,
-	val token: String,
-	val libraries: Set<String>? = null,
-	val minimumRating: Long = 0,
-) {
-	init {
-		require(minimumRating in 0L..100L) {
-			"Minimum rating must be in the range [0, 100]: $minimumRating"
+	@Serializable
+	data class Plex(
+		val host: String,
+		val token: String,
+		val libraries: Set<String>? = null,
+		val minimumRating: Long = 0,
+	) {
+		init {
+			require(minimumRating in 0L..100L) {
+				"Minimum rating must be in the range [0, 100]: $minimumRating"
+			}
 		}
 	}
 }
