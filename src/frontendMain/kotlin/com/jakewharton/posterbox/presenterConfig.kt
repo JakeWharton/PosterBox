@@ -6,19 +6,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.ktor.client.HttpClient
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
 @Composable
-fun presentAppState(client: HttpClient): AppState {
+fun presentAppState(backend: BackendService): AppState {
 	var appState by remember { mutableStateOf<AppState>(AppState.None()) }
 
 	LaunchedEffect(Unit) {
 		var eTag: String? = null
 		while (isActive) {
-			when (val appDataResponse = loadAppData(client, eTag)) {
+			when (val appDataResponse = backend.appData(eTag)) {
 				is AppDataResponse.Success -> {
 					val newAppState = AppState.Loaded(
 						appData = appDataResponse.config,

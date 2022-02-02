@@ -20,9 +20,10 @@ fun main() {
 	body.clear()
 
 	val client = HttpClient(Js)
+	val backend = HttpBackendService(client)
 
 	renderComposable(body) {
-		when (val appState = presentAppState(client)) {
+		when (val appState = presentAppState(backend)) {
 			is AppState.None -> {
 				// TODO handle errors in this state
 				LoadingConfig()

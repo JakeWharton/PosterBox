@@ -62,17 +62,17 @@ private class PosterBoxCommand(
 		)
 
 		val httpClient = HttpClient(Java)
-		val plexService = config.plex?.let { HttpPlexService(httpClient, it) }
+		val plex = config.plex?.let { HttpPlexService(httpClient, it) }
 
 		embeddedServer(Netty, port) {
 			var state: HttpState? = null
 
-			if (plexService != null) {
+			if (plex != null) {
 				launch {
 					var posters: List<Poster>? = null
 					while (isActive) {
 						// TODO handle errors
-						val newPosters = plexService.posters()
+						val newPosters = plex.posters()
 						if (newPosters != posters) {
 							val appData = AppData(
 								renderSettings = renderSettings,
@@ -103,13 +103,13 @@ private class PosterBoxCommand(
 					}
 				}
 
-				if (plexService != null) {
+				if (plex != null) {
 					get(Poster.route) {
 						val posterPath = checkNotNull(call.request.queryParameters["path"]) {
 							"Query parameter 'path required"
 						}
 						// TODO how to handle/propagate errors?
-						val image = plexService.poster(posterPath)
+						val image = plex.poster(posterPath)
 						call.respondBytes(image.bytes, image.contentType)
 					}
 				}
