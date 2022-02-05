@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import kotlin.random.Random
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Footer
@@ -25,8 +24,6 @@ fun PosterBox(appData: AppData) {
 	PosterDisplay(appData)
 }
 
-private fun <T> List<T>.randomItem(): T = get(Random.nextInt(size))
-
 @Composable
 fun PosterDisplay(appData: AppData) {
 	// Ensure effects capture state which can be re-read rather than raw values. This ensures changes
@@ -34,27 +31,18 @@ fun PosterDisplay(appData: AppData) {
 	val renderSettings by rememberUpdatedState(appData.renderSettings)
 	val posters by rememberUpdatedState(appData.posters)
 
+	val posterRandomizer: PosterRandomizer = remember { WeightedHistoricalPosterRandomizer() }
+
 	// Start with the same poster loaded in both positions. The browser should de-duplicate this
 	// request ensuring it is displayed as soon as possible.
-	var posterOne by remember { mutableStateOf(posters.randomItem()) }
+	var posterOne by remember { mutableStateOf(posterRandomizer.next(posters)) }
 	var posterTwo by remember { mutableStateOf(posterOne) }
 	var posterOneActive by remember { mutableStateOf(true) }
 
 	if (posters.size > 1) {
 		LaunchedEffect(Unit) {
-			val recentlySeenPosters = ArrayDeque<Poster>()
-			recentlySeenPosters.addLast(posterOne)
-
 			while (true) {
-				val nextPoster = posters.randomItem()
-				if (nextPoster in recentlySeenPosters) {
-					continue // Try again.
-				}
-				while (recentlySeenPosters.size >= posters.size / 4) {
-					recentlySeenPosters.removeFirst()
-				}
-				recentlySeenPosters.addLast(nextPoster)
-
+				val nextPoster = posterRandomizer.next(posters)
 				if (posterOneActive) {
 					posterTwo = nextPoster
 				} else {

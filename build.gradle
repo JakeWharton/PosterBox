@@ -25,6 +25,11 @@ kotlin {
 				implementation(libs.kotlinx.serialization.json)
 			}
 		}
+		commonTest {
+			dependencies {
+				implementation(libs.kotlin.test)
+			}
+		}
 		backendMain {
 			dependencies {
 				implementation(libs.kotlinx.coroutines.core)
@@ -38,11 +43,6 @@ kotlin {
 				implementation(libs.logback)
 				// This is only so the compiler plugin (which is added to all targets) does not error.
 				implementation(libs.jetbrains.compose.runtime)
-			}
-		}
-		backendTest {
-			dependencies {
-				implementation(libs.kotlin.test)
 			}
 		}
 		frontendMain {
