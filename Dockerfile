@@ -5,7 +5,10 @@ RUN apk add \
       # Install an Alpine-aware copy of Node. The version Kotlin would download targets glibc.
       nodejs \
       # Binutils provides objcopy binary which is used by --strip-debug jlink flag.
-      binutils
+      binutils \
+      # Gradle build runs git to embed SHA.
+      git \
+    ;
 WORKDIR /app
 
 # Cache the Gradle binary separately from the build.
@@ -40,7 +43,8 @@ RUN jdeps \
     # Replace trailing comma with a newline.
     | sed 's/,$/\n/' \
     # Print to stdout AND write to this file.
-    | tee jdeps.txt
+    | tee jdeps.txt \
+  ;
 
 # Build custom minimal JRE with only the modules we need.
 RUN jlink \
@@ -50,7 +54,8 @@ RUN jlink \
       --no-header-files \
       --no-man-pages \
       --output jre \
-      --add-modules $(cat jdeps.txt)
+      --add-modules $(cat jdeps.txt) \
+   ;
 
 FROM alpine:3.15
 
