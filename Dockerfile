@@ -1,5 +1,5 @@
 # If you change this major version, change the --multi-release jdeps flag below
-FROM openjdk:18-alpine AS build
+FROM openjdk:19-alpine AS build
 
 RUN apk add \
       # Install an Alpine-aware copy of Node. The version Kotlin would download targets glibc.
