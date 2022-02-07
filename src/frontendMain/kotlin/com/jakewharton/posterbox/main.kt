@@ -6,6 +6,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.js.Js
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.coroutines.delay
 import kotlinx.dom.clear
 import org.jetbrains.compose.web.dom.Div
@@ -40,6 +41,11 @@ fun main() {
 
 				// TODO handle errors in this state
 				PosterBox(appState.appData)
+			}
+			AppState.NeedsReload -> {
+				LaunchedEffect(Unit) {
+					window.location.reload()
+				}
 			}
 		}
 	}

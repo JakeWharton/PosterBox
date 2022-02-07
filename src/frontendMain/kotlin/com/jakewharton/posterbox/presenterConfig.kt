@@ -19,12 +19,17 @@ fun presentAppState(backend: BackendService): AppState {
 		while (isActive) {
 			when (val appDataResponse = backend.appData(eTag)) {
 				is AppDataResponse.Success -> {
-					val newAppState = AppState.Loaded(
-						appData = appDataResponse.config,
-					)
-					console.log("Loaded new config! ${appDataResponse.eTag}")
-					appState = newAppState
-					eTag = appDataResponse.eTag
+					if (appDataResponse.config.gitSha != gitSha) {
+						console.log("Needs reload. Server git SHA ${appDataResponse.config.gitSha} != client git SHA $gitSha.")
+						appState = AppState.NeedsReload
+					} else {
+						val newAppState = AppState.Loaded(
+							appData = appDataResponse.config,
+						)
+						console.log("Loaded new config! ${appDataResponse.eTag}")
+						appState = newAppState
+						eTag = appDataResponse.eTag
+					}
 				}
 				is AppDataResponse.NotModified -> {
 					// Nothing to do!
@@ -34,6 +39,7 @@ fun presentAppState(backend: BackendService): AppState {
 					appState = when (val oldAppState = appState) {
 						is AppState.None -> oldAppState.copy(error = appDataResponse.error)
 						is AppState.Loaded -> oldAppState.copy(error = appDataResponse.error)
+						AppState.NeedsReload -> oldAppState
 					}
 				}
 			}
@@ -47,6 +53,10 @@ fun presentAppState(backend: BackendService): AppState {
 
 sealed interface AppState {
 	val error: String?
+
+	object NeedsReload : AppState {
+		override val error: String? get() = null
+	}
 
 	data class None(
 		override val error: String? = null,

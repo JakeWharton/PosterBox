@@ -9,6 +9,24 @@ plugins {
 
 mainClassName = 'com.jakewharton.posterbox.Main'
 
+tasks.register('gitShaWriterTask') {
+	def gitSha = 'git rev-parse --verify HEAD'.execute().text.trim()
+	it.inputs.property("gitSha", gitSha)
+
+	def generatedDir = project.layout.buildDirectory.dir("generated/gitSha")
+	it.outputs.dir(generatedDir)
+
+	it.doLast {
+		def versionFile = generatedDir.get().file("com/jakewharton/posterbox/version.kt").asFile
+		versionFile.parentFile.mkdirs()
+		versionFile.text = """// Generated file. Do not edit!
+package com.jakewharton.posterbox
+
+internal const val gitSha = "${gitSha}"
+"""
+	}
+}
+
 kotlin {
 	js("frontend") {
 		browser()
@@ -20,6 +38,9 @@ kotlin {
 
 	sourceSets {
 		commonMain {
+			kotlin {
+				srcDir(gitShaWriterTask)
+			}
 			dependencies {
 				api(libs.kotlinx.serialization.core)
 				implementation(libs.kotlinx.serialization.json)

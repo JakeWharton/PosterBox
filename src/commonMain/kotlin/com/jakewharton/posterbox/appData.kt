@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class AppData(
+	val gitSha: String,
 	val renderSettings: RenderSettings,
 	val posters: List<Poster>,
 ) {

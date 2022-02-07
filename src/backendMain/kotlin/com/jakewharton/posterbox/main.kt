@@ -75,6 +75,7 @@ private class PosterBoxCommand(
 						val newPosters = plex.posters()
 						if (newPosters != posters) {
 							val appData = AppData(
+								gitSha = gitSha,
 								renderSettings = renderSettings,
 								posters = newPosters,
 							)
