@@ -40,7 +40,7 @@ kotlin {
 				implementation(libs.ktor.client.java)
 				implementation(libs.ktoml)
 				implementation(libs.clikt)
-				implementation(libs.logback)
+				implementation(libs.slf4j.simple)
 				// This is only so the compiler plugin (which is added to all targets) does not error.
 				implementation(libs.jetbrains.compose.runtime)
 			}
