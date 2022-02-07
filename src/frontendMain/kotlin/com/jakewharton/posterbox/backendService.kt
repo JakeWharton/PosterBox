@@ -1,10 +1,9 @@
 package com.jakewharton.posterbox
 
 import io.ktor.client.HttpClient
-import io.ktor.client.features.expectSuccess
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.readText
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders.ETag
 import io.ktor.http.HttpStatusCode
 import kotlinx.browser.window
@@ -25,7 +24,7 @@ class HttpBackendService(
 	override suspend fun appData(eTag: String?): AppDataResponse {
 		val response = try {
 			// Explicitly specify origin to work around https://youtrack.jetbrains.com/issue/KTOR-3191.
-			client.get<HttpResponse>("${window.location.origin}${AppData.route}") {
+			client.get("${window.location.origin}${AppData.route}") {
 				expectSuccess = false // Allow non-200 responses.
 			}
 		} catch (e: Throwable) {
@@ -39,7 +38,7 @@ class HttpBackendService(
 				if (newETag == eTag) {
 					return AppDataResponse.NotModified
 				}
-				val configJson = response.readText()
+				val configJson = response.bodyAsText()
 				val config = AppData.decodeFromJson(configJson)
 				AppDataResponse.Success(config, newETag)
 			}

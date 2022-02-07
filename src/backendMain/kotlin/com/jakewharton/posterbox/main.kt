@@ -8,24 +8,24 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
-import io.ktor.application.call
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.java.Java
 import io.ktor.http.HttpHeaders.IfNoneMatch
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.NotModified
-import io.ktor.http.content.resource
-import io.ktor.http.content.resources
-import io.ktor.http.content.static
-import io.ktor.request.header
-import io.ktor.response.etag
-import io.ktor.response.respond
-import io.ktor.response.respondBytes
-import io.ktor.response.respondText
-import io.ktor.routing.get
-import io.ktor.routing.routing
+import io.ktor.server.application.call
+import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.server.http.content.resource
+import io.ktor.server.http.content.resources
+import io.ktor.server.http.content.static
+import io.ktor.server.request.header
+import io.ktor.server.response.etag
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.util.UUID
@@ -64,7 +64,7 @@ private class PosterBoxCommand(
 		val httpClient = HttpClient(Java)
 		val plex = config.plex?.let { HttpPlexService(httpClient, it) }
 
-		embeddedServer(Netty, port) {
+		embeddedServer(CIO, port) {
 			var state: HttpState? = null
 
 			if (plex != null) {

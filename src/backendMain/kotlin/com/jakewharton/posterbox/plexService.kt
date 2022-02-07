@@ -3,9 +3,8 @@ package com.jakewharton.posterbox
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.readBytes
-import io.ktor.client.statement.readText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Accept
 import io.ktor.http.URLBuilder
@@ -35,12 +34,12 @@ class HttpPlexService(
 
 	override suspend fun posters(): List<Poster> {
 		val sectionsUrl = URLBuilder(config.host).takeFrom("/library/sections").build()
-		val sectionsResponse = client.get<HttpResponse>(sectionsUrl) {
+		val sectionsResponse = client.get(sectionsUrl) {
 			header(PlexToken, config.token)
 			header(Accept, ContentType.Application.Json)
 		}
 		// TODO error handling
-		val sectionsJson = sectionsResponse.readText()
+		val sectionsJson = sectionsResponse.bodyAsText()
 		val sections = json.decodeFromString(PlexResponse.serializer(PlexSections.serializer()), sectionsJson)
 
 		return sections.mediaContainer
@@ -49,12 +48,12 @@ class HttpPlexService(
 			.filter { config.libraries == null || it.title in config.libraries }
 			.flatMap {
 				val sectionUrl = URLBuilder(config.host).takeFrom("/library/sections/${it.key}/all").build()
-				val sectionResponse = client.get<HttpResponse>(sectionUrl) {
+				val sectionResponse = client.get(sectionUrl) {
 					header(PlexToken, config.token)
 					header(Accept, ContentType.Application.Json)
 				}
 				// TODO error handling
-				val sectionJson = sectionResponse.readText()
+				val sectionJson = sectionResponse.bodyAsText()
 				val section = json.decodeFromString(PlexResponse.serializer(PlexItems.serializer()), sectionJson)
 				section.mediaContainer.items
 					.filter { item -> (item.computedRating ?: 0) >= config.minimumRating }
@@ -74,7 +73,7 @@ class HttpPlexService(
 
 	override suspend fun poster(path: String): PosterImage {
 		val posterUrl = URLBuilder(config.host).takeFrom(path).build()
-		val response = client.get<HttpResponse>(posterUrl) {
+		val response = client.get(posterUrl) {
 			header(PlexToken, config.token)
 		}
 		val imageBytes = response.readBytes()
