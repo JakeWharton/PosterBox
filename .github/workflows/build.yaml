@@ -7,9 +7,8 @@ on:
       - '**'
 
 jobs:
-  build:
+  gradle:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
@@ -18,3 +17,10 @@ jobs:
           distribution: 'zulu'
           java-version: 17
       - run: ./gradlew build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gradle/wrapper-validation-action@v1
+      - run: docker build .

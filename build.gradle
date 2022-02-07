@@ -55,6 +55,12 @@ kotlin {
 	}
 }
 
+if (hasProperty("skipNodeDownload")) {
+	kotlinNodeJs {
+		download = false
+	}
+}
+
 // Embed compiled JS and other frontend resources into the backend jar.
 def backendJar = tasks.named('backendJar')
 backendJar.configure {
