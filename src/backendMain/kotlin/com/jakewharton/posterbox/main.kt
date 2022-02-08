@@ -2,10 +2,11 @@
 package com.jakewharton.posterbox
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.help
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
 import io.ktor.client.HttpClient
@@ -42,13 +43,12 @@ fun main(vararg args: String) {
 private class PosterBoxCommand(
 	fs: FileSystem,
 ) : CliktCommand(
-	name = "poster-box",
+	name = "posterbox",
 	help = "HTTP server for Poster Box frontend",
 ) {
-	private val configFile by option(metavar = "FILE")
+	private val configFile by argument("CONFIG")
 		.path(fileSystem = fs)
 		.help("TOML config file")
-		.required()
 	private val port by option(metavar = "PORT")
 		.int()
 		.default(defaultPort)

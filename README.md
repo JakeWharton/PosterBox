@@ -1,8 +1,75 @@
 # Poster Box
 
-Rotating display of Movie and TV posters.
+Rotating display of Plex posters meant for a vertical TV or monitor.
 
-## Configuration
+Available as a binary and Docker container.
+
+## Usage
+
+You can run Poster Box in one of two ways:
+
+* [Command line](#command-line)
+* [Docker](#docker)
+
+### Command-line
+
+Install on Mac OS with:
+```
+$ brew install JakeWharton/repo/posterbox
+```
+
+For other platforms, download ZIP from
+[latest release](https://github.com/JakeWharton/posterbox/releases/latest)
+and run `bin/posterbox` or `bin/posterbox.bat`.
+
+```
+$ posterbox --help
+Usage: posterbox [OPTIONS] CONFIG
+
+  HTTP server for Poster Box frontend
+
+Options:
+  --port PORT  Port for the HTTP server (default 9931)
+  -h, --help   Show this message and exit
+
+Arguments:
+  CONFIG  TOML config file
+```
+
+
+### Docker
+
+The container starts the webserver on port 9931.
+It expects to load the [configuration TOML](#configuration) from `/config/config.toml` so mount a volume accordingly.
+
+[![Docker Image Version](https://img.shields.io/docker/v/jakewharton/posterbox?sort=semver)][hub]
+[![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/posterbox)][hub]
+
+[hub]: https://hub.docker.com/r/jakewharton/posterbox/
+
+```
+$ docker run -it --rm
+    -v /path/to/config:/config \
+    jakewharton/posterbox:trunk
+```
+
+To be notified when sync is failing visit https://healthchecks.io, create a check, and specify
+the ID to the container using the `HEALTHCHECK_ID` environment variable.
+
+#### Docker Compose
+
+```yaml
+version: '2'
+services:
+  dodo:
+    image: jakewharton/posterbox:trunk
+    restart: unless-stopped
+    volumes:
+      - /path/to/config:/config
+```
+
+
+### Configuration
 
 The configuration file allows customization of behavior and specifies the source of content.
 All top-level keys and sections are optional.
@@ -44,6 +111,15 @@ minimumRating = 40
 #  Default: "PT15M" (15 minutes)
 syncIntervalDuration = "PT30M"
 ```
+
+
+## Development
+
+To run the latest code build with `./gradlew installDist`.  This will put the application into
+`build/install/posterbox/`. From there you can use the [command-line instructions](#command-line)
+instructions to run.
+
+The Docker container can be built with `docker build .`.
 
 
 ## License
