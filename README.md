@@ -2,6 +2,10 @@
 
 Rotating display of Plex posters meant for a vertical TV or monitor.
 
+<a href="sample1.png"><img src="sample1.png" width="32%"/></a>
+<a href="sample2.png"><img src="sample2.png" width="32%"/></a>
+<a href="sample3.png"><img src="sample3.png" width="32%"/></a>
+
 Available as a binary and Docker container.
 
 ## Usage
