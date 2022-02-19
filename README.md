@@ -121,7 +121,7 @@ syncIntervalDuration = "PT30M"
 
 To run the latest code build with `./gradlew installDist`.  This will put the application into
 `build/install/posterbox/`. From there you can use the [command-line instructions](#command-line)
-instructions to run.
+to run.
 
 The Docker container can be built with `docker build .`.
 
