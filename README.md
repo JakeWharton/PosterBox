@@ -62,7 +62,7 @@ $ docker run -it --rm
 ```yaml
 version: '2'
 services:
-  dodo:
+  posterbox:
     image: jakewharton/posterbox
     restart: unless-stopped
     volumes:
