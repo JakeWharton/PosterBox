@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.help
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
@@ -15,6 +16,7 @@ import io.ktor.http.HttpHeaders.IfNoneMatch
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.NotModified
 import io.ktor.server.application.call
+import io.ktor.server.application.log
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.http.content.resource
@@ -34,6 +36,7 @@ import kotlin.io.path.readText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY
 
 fun main(vararg args: String) {
 	PosterBoxCommand(FileSystems.getDefault())
@@ -53,8 +56,14 @@ private class PosterBoxCommand(
 		.int()
 		.default(defaultPort)
 		.help("Port for the HTTP server (default $defaultPort)")
+	private val debug by option(hidden = true, envvar = "POSTERBOX_DEBUG")
+		.flag()
 
 	override fun run() {
+		if (debug) {
+			System.setProperty(DEFAULT_LOG_LEVEL_KEY, "DEBUG")
+		}
+
 		val config = Config.parseFromToml(configFile.readText())
 		val renderSettings = RenderSettings(
 			itemDisplayDuration = config.itemDisplayDuration,
@@ -68,12 +77,17 @@ private class PosterBoxCommand(
 			var state: HttpState? = null
 
 			if (plex != null) {
+				log.debug("[Plex] Starting sync coroutine")
 				launch {
 					var posters: List<Poster>? = null
 					while (isActive) {
+						log.debug("[Plex] Performing poster sync")
 						// TODO handle errors
 						val newPosters = plex.posters()
-						if (newPosters != posters) {
+						if (newPosters == posters) {
+							log.debug("[Plex] No poster changes")
+						} else {
+							log.debug("[Plex] New posters! $newPosters")
 							val appData = AppData(
 								gitSha = gitSha,
 								renderSettings = renderSettings,
