@@ -126,6 +126,16 @@ to run.
 The Docker container can be built with `docker build .`.
 
 
+## Posterr
+
+Poster Box was inspired by [Posterr](https://github.com/petersem/posterr) which is a far more
+feature-filled and customizable tool. Posterr was not able to run smoothly on my Raspberry Pi Zero
+due to its use of a jQuery-based carousel and creating DOM nodes for every poster when loaded.
+Poster Box has only two sets of DOM elements which are updated when off-screen and animated using
+CSS animations. If you like Poster Box but wish it had more features and integrated with more
+tools you should try Posterr!
+
+
 ## License
 
     Copyright 2022 Jake Wharton
