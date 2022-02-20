@@ -64,4 +64,4 @@ ENV JAVA_HOME="/jre"
 
 COPY --from=build /app/build/install/posterbox/ /app
 
-ENTRYPOINT ["/app/bin/posterbox", "--config-file", "/config/config.toml"]
+ENTRYPOINT ["/app/bin/posterbox", "/config/config.toml"]
