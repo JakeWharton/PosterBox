@@ -37,7 +37,8 @@ RUN jdeps \
     # Used only by kotlinx.coroutines debug agent which we do not use.
     | grep -v jdk.unsupported \
     # Used only by Ktor for detecting IntelliJ IDEA debugger which we do not use.
-    | grep -v java.management \
+    # BUT our HTTP server cannot respond to requests without this module for some reason...
+    #| grep -v java.management \
     # Join lines with comma.
     | tr '\n' ',' \
     # Replace trailing comma with a newline.
