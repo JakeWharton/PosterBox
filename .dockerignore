@@ -1,0 +1,13 @@
+# IntelliJ IDEA
+/.idea
+
+# Gradle
+/.gradle
+build
+/reports
+
+# Git
+.git
+
+# GitHub
+.github
