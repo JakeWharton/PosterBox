@@ -60,6 +60,8 @@ RUN jlink \
 
 FROM alpine:3.15
 EXPOSE 9931
+HEALTHCHECK --interval=1m --timeout=3s \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:9931/ || exit 1
 
 COPY --from=build /app/jre /jre
 ENV JAVA_HOME="/jre"
