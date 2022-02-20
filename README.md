@@ -54,11 +54,8 @@ It expects to load the [configuration TOML](#configuration) from `/config/config
 ```
 $ docker run -it --rm
     -v /path/to/config:/config \
-    jakewharton/posterbox:trunk
+    jakewharton/posterbox
 ```
-
-To be notified when sync is failing visit https://healthchecks.io, create a check, and specify
-the ID to the container using the `HEALTHCHECK_ID` environment variable.
 
 #### Docker Compose
 
@@ -66,7 +63,7 @@ the ID to the container using the `HEALTHCHECK_ID` environment variable.
 version: '2'
 services:
   dodo:
-    image: jakewharton/posterbox:trunk
+    image: jakewharton/posterbox
     restart: unless-stopped
     volumes:
       - /path/to/config:/config
