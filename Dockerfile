@@ -58,6 +58,7 @@ RUN jlink \
    ;
 
 FROM alpine:3.15
+EXPOSE 9931
 
 COPY --from=build /app/jre /jre
 ENV JAVA_HOME="/jre"
