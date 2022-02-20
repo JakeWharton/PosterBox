@@ -95,9 +95,11 @@ itemTransition = "slide-right"
 #  This section is optional but has required keys if it is present.
 [plex]
 # Plex host URL (required).
-#  Value: DNS hostname or IP with protocol and optional port.
+#  Value: String containing DNS hostname or IP with protocol and optional port.
 host = "http://plexms:32800"
 # Plex authentication token (required).
+# See https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/.
+#  Value: String
 token = "abc123"
 # Libraries from which to pull posters (optional). No matter the contents of this array,
 # only entries of type "movie" or "show" will be used.
@@ -111,7 +113,7 @@ libraries = [ "Movies", "TV Shows" ]
 minimumRating = 40
 # Duration between synchronizing items from Plex server as an ISO 8601 duration
 # string (optional). See https://en.wikipedia.org/wiki/ISO_8601#Durations.
-#  Value: must be positive duration
+#  Value: String containing positive duration
 #  Default: "PT15M" (15 minutes)
 syncIntervalDuration = "PT30M"
 ```
