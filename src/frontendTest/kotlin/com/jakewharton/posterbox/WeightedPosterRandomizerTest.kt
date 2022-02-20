@@ -1,5 +1,6 @@
 package com.jakewharton.posterbox
 
+import com.jakewharton.posterbox.WeightedHistoricalPosterRandomizer.Companion.ratingWeight
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -8,6 +9,20 @@ import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 
 class WeightedPosterRandomizerTest {
+	@Test fun ratingWeights() {
+		assertEquals(1, poster(1, null).ratingWeight)
+		assertEquals(1, poster(1, 0).ratingWeight)
+		assertEquals(1, poster(1, 10).ratingWeight)
+		assertEquals(2, poster(1, 11).ratingWeight)
+		assertEquals(2, poster(1, 20).ratingWeight)
+		assertEquals(9, poster(1, 90).ratingWeight)
+		assertEquals(10, poster(1, 91).ratingWeight)
+		assertEquals(10, poster(1, 100).ratingWeight)
+
+		assertEquals(1, poster(1, -1000).ratingWeight)
+		assertEquals(10, poster(1, 1000).ratingWeight)
+	}
+
 	@Test fun emptyPosterListThrows() {
 		val randomizer = WeightedHistoricalPosterRandomizer()
 		val t = assertFailsWith<IllegalArgumentException> {
@@ -77,7 +92,7 @@ class WeightedPosterRandomizerTest {
 	}
 
 	@Test fun historicalRejection() {
-		val randomizer = WeightedHistoricalPosterRandomizer(Random(0), .25f)
+		val randomizer = WeightedHistoricalPosterRandomizer(Random(4), .25f)
 
 		val poster1 = poster(1, 100)
 		val poster2 = poster(2, 1)
@@ -96,7 +111,7 @@ class WeightedPosterRandomizerTest {
 	}
 
 	@Test fun listGrowAdjustsHistoricalCache() {
-		val randomizer = WeightedHistoricalPosterRandomizer(Random(0), .5f)
+		val randomizer = WeightedHistoricalPosterRandomizer(Random(4), .5f)
 
 		val poster1 = poster(1, 100)
 		val poster2 = poster(2, 1)

@@ -41,7 +41,13 @@ class WeightedHistoricalPosterRandomizer(
 		return nextPoster
 	}
 
-	private companion object {
-		val Poster.ratingWeight: Int get() = rating?.coerceAtLeast(1) ?: 1
+	companion object {
+		private const val buckets = 10
+
+		val Poster.ratingWeight: Int
+			get() {
+				val boundRating = rating?.coerceIn(1, 100) ?: 1
+				return ((boundRating - 1) / buckets) + 1
+			}
 	}
 }
