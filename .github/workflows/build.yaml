@@ -31,8 +31,7 @@ jobs:
       - name: Test Docker container
         run: |
           mkdir temp
-          # TODO change to just touch when https://github.com/JakeWharton/PosterBox/pull/13 lands.
-          echo "itemDisplayDuration = \"PT10S\"" > temp/config.toml
+          touch temp/config.toml
           docker run -d -v `pwd`/temp:/config -p 9931:9931 posterbox
           # Wait for container to start up and bind to port.
           timeout 10 sh -c 'until nc -z localhost 9931; do sleep 1; done;'

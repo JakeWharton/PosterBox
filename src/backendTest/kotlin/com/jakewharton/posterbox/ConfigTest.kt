@@ -1,17 +1,15 @@
 package com.jakewharton.posterbox
 
-import com.akuleshov7.ktoml.exceptions.KtomlException
+import com.akuleshov7.ktoml.exceptions.TomlDecodingException
 import com.jakewharton.posterbox.Config.Plex
-import kotlin.test.Ignore
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class ConfigTest {
-	@Ignore // TODO https://github.com/akuleshov7/ktoml/issues/94
 	@Test fun emptyConfig() {
 		val expected = Config(
 			itemDisplayDuration = 15.seconds,
@@ -99,23 +97,23 @@ class ConfigTest {
 	}
 
 	@Test fun plexHostMissingThrows() {
-		val t = assertFailsWith<KtomlException> {
+		val t = assertFailsWith<TomlDecodingException> {
 			Config.parseFromToml("""
 			|[plex]
 			|token = "abc123"
 			|""".trimMargin())
 		}
-		assertTrue("Missing the required field <host>" in t.message!!)
+		assertContains(t.message!!, "Missing required property <host>")
 	}
 
 	@Test fun plexTokenMissingThrows() {
-		val t = assertFailsWith<KtomlException> {
+		val t = assertFailsWith<TomlDecodingException> {
 			Config.parseFromToml("""
 			|[plex]
 			|host = "http://example.com"
 			|""".trimMargin())
 		}
-		assertTrue("Missing the required field <token>" in t.message!!)
+		assertContains(t.message!!, "Missing required property <token>")
 	}
 
 	@Test fun plexConfigMinimalValid() {
