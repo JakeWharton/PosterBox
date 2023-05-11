@@ -19,7 +19,7 @@ ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
-ktoml = { module = "com.akuleshov7:ktoml-core", version = "0.2.11" }
+ktoml = { module = "com.akuleshov7:ktoml-core", version = "0.5.0" }
 jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
 jetbrains-compose-web-core = { module = "org.jetbrains.compose.web:web-core", version.ref = "compose" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version = "1.7.36" }
