@@ -58,7 +58,7 @@ RUN jlink \
       --add-modules $(cat jdeps.txt) \
    ;
 
-FROM alpine:3.19.1
+FROM alpine:3.20.3
 EXPOSE 9931
 HEALTHCHECK --interval=1m --timeout=3s \
   CMD wget --no-verbose --tries=1 --spider http://localhost:9931/ || exit 1
