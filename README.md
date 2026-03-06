@@ -1,7 +1,13 @@
 # binarygeek119 edit here
 
 i have modded with chatgpt to add jullyfin support. im not a dev so i wont be doing any more then this.
-docker image here binarygeek119/posterbox-jellyfin:latest
+docker image here
+binarygeek119/posterbox-jellyfin:latest
+
+do edit the config file.
+
+docker compose file here
+https://raw.githubusercontent.com/binarygeek119/PosterBox-Jellyfin/refs/heads/Jellyfin-support/docker-compose.yml
 
 enjoy.
 
