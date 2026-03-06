@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  posterbox:
+    build: .
+    container_name: posterbox
+    ports:
+      - "9931:9931"
+    volumes:
+      - ./config:/config:ro
+    restart: unless-stopped

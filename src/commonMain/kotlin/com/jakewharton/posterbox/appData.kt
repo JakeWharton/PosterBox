@@ -11,83 +11,81 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class AppData(
-	val gitSha: String,
-	val renderSettings: RenderSettings,
-	val posters: List<Poster>,
+  val gitSha: String,
+  val renderSettings: RenderSettings,
+  val posters: List<Poster>,
 ) {
-	fun encodeToJson(): String {
-		return serializer.encodeToString(serializer(), this)
-	}
+  fun encodeToJson(): String {
+    return serializer.encodeToString(serializer(), this)
+  }
 
-	companion object {
-		private val serializer = Json
-		const val route = "/data.json"
+  companion object {
+    private val serializer = Json
+    const val route = "/data.json"
 
-		fun decodeFromJson(string: String): AppData {
-			return serializer.decodeFromString(serializer(), string)
-		}
-	}
+    fun decodeFromJson(string: String): AppData {
+      return serializer.decodeFromString(serializer(), string)
+    }
+  }
 }
 
 @Serializable
 data class RenderSettings(
-	@Serializable(DurationSerializer::class)
-	val itemDisplayDuration: Duration,
-	@Serializable(ItemTransitionSerializer::class)
-	val itemTransition: ItemTransition,
+  @Serializable(DurationSerializer::class) val itemDisplayDuration: Duration,
+  @Serializable(ItemTransitionSerializer::class) val itemTransition: ItemTransition,
 )
 
 @Serializable
 data class Poster(
-	val title: String,
-	val studio: String? = null,
-	/** In minutes */
-	val runtime: Int,
-	val year: Int,
-	val contentRating: String? = null,
-	/** Range `[0,100]` */
-	val rating: Int? = null,
-	val plexPoster: String,
+  val title: String,
+  val studio: String? = null,
+  /** In minutes */
+  val runtime: Int,
+  val year: Int,
+  val contentRating: String? = null,
+  /** Range `[0,100]` */
+  val rating: Int? = null,
+  val imagePath: String,
 ) {
-	companion object {
-		const val route = "/plexPoster"
-	}
+  companion object {
+    const val route = "/poster"
+  }
 }
 
 enum class ItemTransition(val string: String) {
-	None("none"),
-	Crossfade("crossfade"),
-	Fade("fade"),
-	SlideLeft("slide-left"),
-	SlideRight("slide-right"),
+  None("none"),
+  Crossfade("crossfade"),
+  Fade("fade"),
+  SlideLeft("slide-left"),
+  SlideRight("slide-right"),
 }
 
 object DurationSerializer : KSerializer<Duration> {
-	override val descriptor = PrimitiveSerialDescriptor("IsoDuration", PrimitiveKind.LONG)
+  override val descriptor = PrimitiveSerialDescriptor("IsoDuration", PrimitiveKind.LONG)
 
-	override fun deserialize(decoder: Decoder): Duration {
-		return Duration.parseIsoString(decoder.decodeString())
-	}
+  override fun deserialize(decoder: Decoder): Duration {
+    return Duration.parseIsoString(decoder.decodeString())
+  }
 
-	override fun serialize(encoder: Encoder, value: Duration) {
-		encoder.encodeString(value.toIsoString())
-	}
+  override fun serialize(encoder: Encoder, value: Duration) {
+    encoder.encodeString(value.toIsoString())
+  }
 }
 
 object ItemTransitionSerializer : KSerializer<ItemTransition> {
-	override val descriptor = PrimitiveSerialDescriptor("ItemTransition", PrimitiveKind.STRING)
+  override val descriptor = PrimitiveSerialDescriptor("ItemTransition", PrimitiveKind.STRING)
 
-	override fun deserialize(decoder: Decoder): ItemTransition {
-		val value = decoder.decodeString()
-		ItemTransition.values().forEach {
-			if (value == it.string) {
-				return it
-			}
-		}
-		throw IllegalArgumentException("Unknown item transition name: $value")
-	}
+  override fun deserialize(decoder: Decoder): ItemTransition {
+    val value = decoder.decodeString()
+    ItemTransition.values().forEach {
+      if (value == it.string) {
+        return it
+      }
+    }
+    throw IllegalArgumentException("Unknown item transition name: $value")
+  }
 
-	override fun serialize(encoder: Encoder, value: ItemTransition) {
-		encoder.encodeString(value.string)
-	}
+  override fun serialize(encoder: Encoder, value: ItemTransition) {
+    encoder.encodeString(value.string)
+  }
 }

@@ -1,5 +1,5 @@
 # If you change this major version, change the --multi-release jdeps flag below
-FROM openjdk:18-alpine AS build
+FROM eclipse-temurin:18-alpine AS build
 
 RUN apk add \
       # Install an Alpine-aware copy of Node. The version Kotlin would download targets glibc.
@@ -59,7 +59,9 @@ RUN jlink \
    ;
 
 FROM alpine:3.22.1
+
 EXPOSE 9931
+
 HEALTHCHECK --interval=1m --timeout=3s \
   CMD wget --no-verbose --tries=1 --spider http://localhost:9931/ || exit 1
 

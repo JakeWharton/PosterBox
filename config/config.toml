@@ -1,0 +1,9 @@
+itemDisplayDuration = "PT60S"
+itemTransition = "slide-right"
+
+[jellyfin]
+host = "http://"
+token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+libraries = ["Movies", "TV"]
+minimumRating = 1
+syncIntervalDuration = "PT15M"
