@@ -4,6 +4,6 @@ itemTransition = "slide-right"
 [jellyfin]
 host = "http://192.168.1.X:8096"
 token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-libraries = ["Movies", "3D Movies", "Stand-Up Comedies Movies"]
+libraries = ["Movies", "TV Shows"]
 minimumRating = 1
 syncIntervalDuration = "PT15M"
