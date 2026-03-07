@@ -1,9 +1,9 @@
 itemDisplayDuration = "PT60S"
-itemTransition = "slide-right"
+itemTransition = "crossfade"
 
 [jellyfin]
 host = "http://192.168.1.X:8096"
 token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 libraries = ["Movies", "TV Shows"]
-minimumRating = 1
+minimumRating = 0
 syncIntervalDuration = "PT15M"
