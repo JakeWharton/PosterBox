@@ -60,8 +60,8 @@ fun PosterDisplay(appData: AppData) {
 		PosterHeader("Now Showing")
 	}
 	Main({ classes(transitionClass(renderSettings.itemTransition)) }) {
-		PosterImage(posterOne.plexPoster, posterOne.title, posterOneActive)
-		PosterImage(posterTwo.plexPoster, posterTwo.title, !posterOneActive)
+		PosterImage(posterOne.imagePath, posterOne.title, posterOneActive)
+		PosterImage(posterTwo.imagePath, posterTwo.title, !posterOneActive)
 	}
 	Footer {
 		PosterFooter(posterOne, posterOneActive)

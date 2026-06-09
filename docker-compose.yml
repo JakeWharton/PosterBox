@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  posterbox:
+    image: binarygeek119/posterbox-jellyfin:latest
+    container_name: posterbox
+    ports:
+      - "9931:9931"
+    volumes:
+      - /mnt/user/programs/Docker/PosterBox-Jellyfin/config:/config:ro
+    restart: unless-stopped

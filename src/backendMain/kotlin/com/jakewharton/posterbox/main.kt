@@ -1,4 +1,5 @@
 @file:JvmName("Main")
+
 package com.jakewharton.posterbox
 
 import com.github.ajalt.clikt.core.CliktCommand
@@ -39,111 +40,116 @@ import kotlinx.coroutines.launch
 import org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY
 
 fun main(vararg args: String) {
-	PosterBoxCommand(FileSystems.getDefault())
-		.main(args)
+  PosterBoxCommand(FileSystems.getDefault()).main(args)
 }
 
 private class PosterBoxCommand(
-	fs: FileSystem,
+  fs: FileSystem,
 ) : CliktCommand(
-	name = "posterbox",
-	help = "HTTP server for Poster Box frontend",
+  name = "posterbox",
+  help = "HTTP server for Poster Box frontend",
 ) {
-	private val configFile by argument("CONFIG")
-		.path(fileSystem = fs)
-		.help("TOML config file")
-	private val port by option(metavar = "PORT")
-		.int()
-		.default(defaultPort)
-		.help("Port for the HTTP server (default $defaultPort)")
-	private val debug by option(hidden = true, envvar = "POSTERBOX_DEBUG")
-		.flag()
+  private val configFile by argument("CONFIG")
+    .path(fileSystem = fs)
+    .help("TOML config file")
 
-	override fun run() {
-		if (debug) {
-			System.setProperty(DEFAULT_LOG_LEVEL_KEY, "DEBUG")
-		}
+  private val port by option(metavar = "PORT")
+    .int()
+    .default(defaultPort)
+    .help("Port for the HTTP server (default $defaultPort)")
 
-		val config = Config.parseFromToml(configFile.readText())
-		val renderSettings = RenderSettings(
-			itemDisplayDuration = config.itemDisplayDuration,
-			itemTransition = config.itemTransition,
-		)
+  private val debug by option(hidden = true, envvar = "POSTERBOX_DEBUG")
+    .flag()
 
-		val httpClient = HttpClient(Java)
-		val plex = config.plex?.let { HttpPlexService(httpClient, it) }
+  override fun run() {
+    if (debug) {
+      System.setProperty(DEFAULT_LOG_LEVEL_KEY, "DEBUG")
+    }
 
-		embeddedServer(CIO, port) {
-			var state: HttpState? = null
+    val config = Config.parseFromToml(configFile.readText())
+    val renderSettings = RenderSettings(
+      itemDisplayDuration = config.itemDisplayDuration,
+      itemTransition = config.itemTransition,
+    )
+    val httpClient = HttpClient(Java)
 
-			if (plex != null) {
-				log.debug("[Plex] Starting sync coroutine")
-				launch {
-					var posters: List<Poster>? = null
-					while (isActive) {
-						log.debug("[Plex] Performing poster sync")
-						// TODO handle errors
-						val newPosters = plex.posters()
-						if (newPosters == posters) {
-							log.debug("[Plex] No poster changes")
-						} else {
-							log.debug("[Plex] New posters! $newPosters")
-							val appData = AppData(
-								gitSha = gitSha,
-								renderSettings = renderSettings,
-								posters = newPosters,
-							)
-							state = HttpState(
-								eTag = UUID.randomUUID().toString(),
-								appDataJson = appData.encodeToJson(),
-							)
-							posters = newPosters
-						}
-						delay(config.plex.syncIntervalDuration)
-					}
-				}
-			}
+    val mediaService: MediaService? = when {
+      config.plex != null -> HttpPlexService(httpClient, config.plex)
+      config.jellyfin != null -> HttpJellyfinService(httpClient, config.jellyfin)
+      else -> null
+    }
 
-			routing {
-				get(AppData.route) {
-					@Suppress("NAME_SHADOWING") // Read once to avoid tearing state.
-					val state = state
-					if (state == null) {
-						call.respond(HttpStatusCode(425, "Too Early"))
-					} else if (call.request.header(IfNoneMatch) == state.eTag) {
-						call.respond(NotModified)
-					} else {
-						call.response.etag(state.eTag)
-						call.respondText(state.appDataJson)
-					}
-				}
+    val syncInterval = when {
+      config.plex != null -> config.plex.syncIntervalDuration
+      config.jellyfin != null -> config.jellyfin.syncIntervalDuration
+      else -> null
+    }
 
-				if (plex != null) {
-					get(Poster.route) {
-						val posterPath = checkNotNull(call.request.queryParameters["path"]) {
-							"Query parameter 'path required"
-						}
-						// TODO how to handle/propagate errors?
-						val image = plex.poster(posterPath)
-						call.respondBytes(image.bytes, image.contentType)
-					}
-				}
+    embeddedServer(CIO, port) {
+      var state: HttpState? = null
 
-				static {
-					resource("/", "static/index.html")
-					resources("static")
-				}
-			}
-		}.start(wait = true)
-	}
+      if (mediaService != null && syncInterval != null) {
+        log.debug("[Media] Starting sync coroutine")
+        launch {
+          var posters: List<Poster>? = null
+          while (isActive) {
+            log.debug("[Media] Performing poster sync")
+            val newPosters = mediaService.posters()
+            if (newPosters != posters) {
+              val appData = AppData(
+                gitSha = gitSha,
+                renderSettings = renderSettings,
+                posters = newPosters,
+              )
+              state = HttpState(
+                eTag = UUID.randomUUID().toString(),
+                appDataJson = appData.encodeToJson(),
+              )
+              posters = newPosters
+            }
+            delay(syncInterval)
+          }
+        }
+      }
 
-	private data class HttpState(
-		val eTag: String,
-		val appDataJson: String,
-		val errors: List<String> = emptyList(),
-	)
+      routing {
+        get(AppData.route) {
+          val currentState = state
+          if (currentState == null) {
+            call.respond(HttpStatusCode(425, "Too Early"))
+          } else if (call.request.header(IfNoneMatch) == currentState.eTag) {
+            call.respond(NotModified)
+          } else {
+            call.response.etag(currentState.eTag)
+            call.respondText(currentState.appDataJson)
+          }
+        }
 
-	private companion object {
-		private const val defaultPort = 9931
-	}
+        if (mediaService != null) {
+          get(Poster.route) {
+            val posterPath = checkNotNull(call.request.queryParameters["path"]) {
+              "Query parameter 'path' required"
+            }
+            val image = mediaService.poster(posterPath)
+            call.respondBytes(image.bytes, image.contentType)
+          }
+        }
+
+        static {
+          resource("/", "static/index.html")
+          resources("static")
+        }
+      }
+    }.start(wait = true)
+  }
+
+  private data class HttpState(
+    val eTag: String,
+    val appDataJson: String,
+    val errors: List<String> = emptyList(),
+  )
+
+  private companion object {
+    private const val defaultPort = 9931
+  }
 }

@@ -8,42 +8,65 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Config(
-	@Serializable(DurationSerializer::class)
-	val itemDisplayDuration: Duration = 15.seconds,
-	@Serializable(ItemTransitionSerializer::class)
-	val itemTransition: ItemTransition = ItemTransition.Fade,
-	val plex: Plex? = null,
+  @Serializable(DurationSerializer::class)
+  val itemDisplayDuration: Duration = 15.seconds,
+  @Serializable(ItemTransitionSerializer::class)
+  val itemTransition: ItemTransition = ItemTransition.Fade,
+  val plex: Plex? = null,
+  val jellyfin: Jellyfin? = null,
 ) {
-	init {
-		require(itemDisplayDuration.isPositive()) {
-			"Item display duration must be positive: $itemDisplayDuration"
-		}
-	}
+  init {
+    require(itemDisplayDuration.isPositive()) {
+      "Item display duration must be positive: $itemDisplayDuration"
+    }
+    require(!(plex != null && jellyfin != null)) {
+      "Only one media source may be configured at a time"
+    }
+  }
 
-	companion object {
-		private val serializer = Toml
+  companion object {
+    private val serializer = Toml
 
-		fun parseFromToml(string: String): Config {
-			return serializer.decodeFromString(serializer(), string)
-		}
-	}
+    fun parseFromToml(string: String): Config {
+      return serializer.decodeFromString(serializer(), string)
+    }
+  }
 
-	@Serializable
-	data class Plex(
-		val host: String,
-		val token: String,
-		val libraries: Set<String>? = null,
-		val minimumRating: Long = 0,
-		@Serializable(DurationSerializer::class)
-		val syncIntervalDuration: Duration = 15.minutes,
-	) {
-		init {
-			require(minimumRating in 0L..100L) {
-				"Minimum rating must be in the range [0, 100]: $minimumRating"
-			}
-			require(syncIntervalDuration.isPositive()) {
-				"Sync interval duration must be positive: $syncIntervalDuration"
-			}
-		}
-	}
+  @Serializable
+  data class Plex(
+    val host: String,
+    val token: String,
+    val libraries: Set<String>? = null,
+    val minimumRating: Long = 0,
+    @Serializable(DurationSerializer::class)
+    val syncIntervalDuration: Duration = 15.minutes,
+  ) {
+    init {
+      require(minimumRating in 0L..100L) {
+        "Minimum rating must be in the range [0, 100]: $minimumRating"
+      }
+      require(syncIntervalDuration.isPositive()) {
+        "Sync interval duration must be positive: $syncIntervalDuration"
+      }
+    }
+  }
+
+  @Serializable
+  data class Jellyfin(
+    val host: String,
+    val token: String,
+    val libraries: Set<String>? = null,
+    val minimumRating: Long = 0,
+    @Serializable(DurationSerializer::class)
+    val syncIntervalDuration: Duration = 15.minutes,
+  ) {
+    init {
+      require(minimumRating in 0L..100L) {
+        "Minimum rating must be in the range [0, 100]: $minimumRating"
+      }
+      require(syncIntervalDuration.isPositive()) {
+        "Sync interval duration must be positive: $syncIntervalDuration"
+      }
+    }
+  }
 }
