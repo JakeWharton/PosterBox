@@ -23,4 +23,4 @@ ktoml = { module = "com.akuleshov7:ktoml-core", version = "0.2.11" }
 jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
 jetbrains-compose-web-core = { module = "org.jetbrains.compose.web:web-core", version.ref = "compose" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version = "1.7.36" }
-clikt = { module = "com.github.ajalt.clikt:clikt", version = "3.4.0" }
+clikt = { module = "com.github.ajalt.clikt:clikt", version = "3.5.4" }
